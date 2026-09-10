@@ -34,18 +34,29 @@ COEFFICIENTS = {
     "N-01": {
         "parameter": "Carbon content of biomass",
         "plain_english": "If you dry out the seaweed, what fraction of what's left is carbon.",
-        "value": 0.252,
+        "value": 0.3217,
         "unit": "fraction of dry weight",
         "range": "0.24 - 0.32",
-        "source": "Reid et al. - weight ratios of kelps for IMTA. Verify publisher version via QUT Library.",
-        "original_region": "Northern hemisphere - Saccharina latissima",
-        "type": "Transferred species",
-        "how_solid": (
-            "WEAK. Completely different species. Must be replaced with an "
-            "Ecklonia radiata value (see Blocker B-04) or we openly document "
-            "the cross-species transfer and widen the range."
+        "source": (
+            "Reed & Miller (2021), cited in Gould et al. (2025), Limnology & "
+            "Oceanography Letters: 'dry biomass is 32.17% C' for Macrocystis "
+            "pyrifera (California). SUPERSEDES the earlier Ecklonia radiata "
+            "value (0.30, Staehr & Wernberg 2009) now that Blocker B-01 has "
+            "independently confirmed the Tower Bay species is Macrocystis "
+            "pyrifera, not Ecklonia radiata - see B-01 for the citation and "
+            "a thermal-tolerance cross-check corroborating it."
         ),
-        "status": "Not started",
+        "original_region": "California (Santa Barbara Channel) - Macrocystis pyrifera (right species per B-01)",
+        "type": "Transferred region",
+        "how_solid": (
+            "GOOD - direct, species-specific %C figure via a 2025 "
+            "peer-reviewed synthesis citing the primary source. Geographic "
+            "transfer caveat remains (California, not Tasmania) - same "
+            "category of caveat as N-02/N-07 below. Range field still shows "
+            "the old Ecklonia-derived bounds and needs updating once a "
+            "Macrocystis-specific range is found."
+        ),
+        "status": "In progress",
         "owner": "Khushi",
     },
     "N-02": {
@@ -161,47 +172,74 @@ COEFFICIENTS = {
     "N-09": {
         "parameter": "Farm location",
         "plain_english": "Exactly where the farm is. Needed to draw it on the map and point the satellite at it.",
-        "value": "TO FIND",
+        "value": (
+            "4 corners (WGS84): -43.387917,147.034183 / -43.389583,147.039067 / "
+            "-43.390967,147.037833 / -43.389333,147.033033. "
+            "Centroid: -43.389450,147.036029"
+        ),
         "unit": "lat / lon",
         "range": "n/a",
-        "source": "IMAS lease, Tower Bay near Dover, southeast Tasmania. Roughly 43.3S 147.0E.",
+        "source": (
+            "Marine and Safety Tasmania (MAST) Notice to Mariners "
+            "M276-26(T), 'D'Entrecasteaux Channel, Tower Bay - Mooring "
+            "Works', published 4 Aug 2026. Permit area marked by 4 IALA "
+            "special marks at the coordinates above (converted from DMS: "
+            "43 23.275'S 147 02.051'E / 43 23.375'S 147 02.344'E / "
+            "43 23.458'S 147 02.270'E / 43 23.360'S 147 01.982'E). "
+            "https://mast.tas.gov.au/notices/m276-26t-dentrecasteaux-channel-tower-bay-mooring-works/"
+        ),
         "original_region": "Southeast Tasmania",
         "type": "Measured",
-        "how_solid": "Ramesh is finding exact corner coordinates.",
-        "status": "Not started",
+        "how_solid": (
+            "GOOD - authoritative government source (navigational safety "
+            "notice, not a secondary citation). Scientific Research Permit "
+            "site, not a commercial Marine Farm Lease - active through "
+            "30 July 2027. See also modules/mapping.py, which already draws "
+            "this boundary (was hardcoded there separately from here - now "
+            "synced)."
+        ),
+        "status": "Done",
         "owner": "Ramesh",
     },
     "N-10": {
         "parameter": "Farm area",
         "plain_english": "How big the farm is. Determines whether we can see it from satellite at all.",
-        "value": "TO FIND",
+        "value": 7.875,
         "unit": "hectares",
         "range": "n/a",
-        "source": "To measure from lease data or satellite imagery",
+        "source": "Shoelace-formula calculation from the N-09 corner coordinates (MAST Notice M276-26(T)).",
         "original_region": "Southeast Tasmania",
-        "type": "Measured",
+        "type": "Derived",
         "how_solid": (
-            "BLOCKING - see Blocker B-02. One hectare = 100 Sentinel-2 "
-            "pixels. Under ~1 ha and satellite biomass estimation is not "
-            "viable."
+            "GOOD - resolves Blocker B-02. ~7.875 ha = ~787 Sentinel-2 "
+            "pixels (1 ha = 100 pixels), well above the ~1 ha satellite-"
+            "viability threshold."
         ),
-        "status": "Not started",
+        "status": "Done",
         "owner": "Moniesh",
     },
     "N-11": {
         "parameter": "Modelled species",
         "plain_english": "Which of the three seaweeds grown at Tower Bay we're actually modelling.",
-        "value": "TO CONFIRM",
+        "value": "Macrocystis pyrifera (giant kelp) - best-evidenced answer, see Blocker B-01",
         "unit": "n/a",
         "range": "n/a",
         "source": "Tower Bay farms Ecklonia radiata, Macrocystis pyrifera and Lessonia corrugata",
         "original_region": "Southeast Tasmania",
         "type": "Measured",
         "how_solid": (
-            "BLOCKING - see Blocker B-01. If the site is predominantly "
-            "Macrocystis, then N-01, N-02 and N-07 all change."
+            "B-01 resolved via independent research (not an IMAS reply): "
+            "Blue Economy CRC's own project page names Tower Bay directly - "
+            "giant kelp was out-planted there and killed by the 2023-24 "
+            "heatwave. Corroborated by a thermal-tolerance cross-check "
+            "(20-21C kill temperature fits Macrocystis's known Tasmanian "
+            "sensitivity far better than Ecklonia radiata or Lessonia "
+            "corrugata). Ramesh has separately emailed IMAS directly "
+            "(9 Sept) for an official confirmation - still pending, revisit "
+            "if that reply says otherwise. This change means N-01/N-02/N-07 "
+            "need Macrocystis-specific values - N-01 already updated."
         ),
-        "status": "Not started",
+        "status": "In progress",
         "owner": "Ramesh",
     },
     "N-12": {
@@ -224,30 +262,56 @@ COEFFICIENTS = {
     "N-13": {
         "parameter": "Dry matter fraction",
         "plain_english": "How much of the wet seaweed is actually solid matter rather than water.",
-        "value": "TO FIND",
+        "value": 0.055,  # see range - a second source (FAO, North America) says 0.118; unresolved conflict
         "unit": "fraction of wet weight",
-        "range": "0.10 - 0.15",
-        "source": "TO FIND - search kelp dry matter content",
-        "original_region": "TBC",
+        "range": "0.055 - 0.118",
+        "source": (
+            "Two Macrocystis pyrifera sources disagree: (1) Forbes et al. "
+            "(2025), J. Phycol., 'A historical review of giant kelp "
+            "harvesting in Tasmania' - real 1970-71 Tasmanian harvest "
+            "records give a wet-to-dry conversion factor of 0.055. (2) FAO "
+            "Fisheries Technical Paper 'Biology of the Macrocystis resource "
+            "in North America' - reports 88.2% water content, i.e. ~0.118 "
+            "dry matter (North America, not Tasmania)."
+        ),
+        "original_region": "Tasmania (Forbes 2025) vs North America (FAO) - conflicting",
         "type": "Literature-derived",
         "how_solid": (
-            "Needed to convert the wet biomass Moniesh produces into the dry "
-            "weight Khushi's carbon fraction applies to. Currently missing."
+            "PARTIAL - not fully resolved. Tasmania-specific figure (0.055) "
+            "is the better regional match but notably lower than the North "
+            "America figure and lower than this project's old placeholder "
+            "range (0.10-0.15). Possibly both are correct for different "
+            "populations/seasons/measurement methods (1970s commercial "
+            "dry-down vs lab wet-content). Using the Tasmania value (0.055) "
+            "as current best guess but flagging - Khushi should verify "
+            "against the Forbes 2025 methods section before trusting this."
         ),
-        "status": "Not started",
+        "status": "In progress",
         "owner": "Khushi",
     },
     "N-14": {
         "parameter": "Kelp yield per hectare",
         "plain_english": "How much seaweed a hectare of farm produces in a season. Only needed if we use the literature fallback instead of satellite.",
-        "value": "TO FIND",
+        "value": 12,  # tonnes/ha, mean; see range for max
         "unit": "tonnes per hectare",
-        "range": "TBC",
-        "source": "TO FIND - search Tasmanian or Australian kelp cultivation yield",
-        "original_region": "TBC",
-        "type": "Literature-derived",
-        "how_solid": "Only required if Blocker B-02 or B-03 forces the literature biomass path. Find it as insurance.",
-        "status": "Not started",
+        "range": "10 - 20 t/ha",
+        "source": (
+            "Forbes et al. (2025), J. Phycol., 'A historical review of "
+            "giant kelp harvesting in Tasmania'. Historical Tasmanian "
+            "surveys: potential yield ~1000-1200 t/km2 (10-12 t/ha); "
+            "Alginates Australia's own records: mean 1200 t/km2, max 2000 "
+            "t/km2 (12 t/ha mean, 20 t/ha max)."
+        ),
+        "original_region": "Tasmania - Macrocystis pyrifera, wild-harvested forests, 1970s data",
+        "type": "Transferred region",
+        "how_solid": (
+            "GOOD region+species match (Tasmania, Macrocystis pyrifera - "
+            "see B-01) but it's wild-forest harvest yield, not farmed-line "
+            "yield - Tower Bay is a cultivation trial, not a natural forest "
+            "being cut. Treat as an upper-bound sanity check for the "
+            "literature fallback rather than a direct farm-yield figure."
+        ),
+        "status": "In progress",
         "owner": "Moniesh",
     },
 }
