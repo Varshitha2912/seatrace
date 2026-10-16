@@ -1,0 +1,210 @@
+
+/* buyer prototype additions */
+.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:14px}
+.field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.field label{font-size:.88rem;font-weight:500}
+.field .hint{font-size:.75rem;color:var(--muted)}
+.field input[type=number],.field input[type=text],.field select{font:inherit;font-family:var(--f-mono);font-size:.95rem;padding:8px 10px;border-radius:6px;border:1px solid var(--rule);background:var(--water);color:var(--ink);width:100%}
+.field input:focus-visible,.field select:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.checks{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:8px 16px}
+.checks label{display:flex;gap:8px;align-items:flex-start;font-size:.9rem}
+.checks input{margin-top:4px;accent-color:var(--accent)}
+.verdict{border-radius:var(--r);padding:16px;border:2px solid currentColor;display:grid;gap:6px}
+.verdict.good{color:var(--good)} .verdict.warn{color:var(--warn)} .verdict.bad{color:var(--bad)}
+.verdict h3,.verdict p{color:var(--ink)}
+.verdict .tag{font-family:var(--f-display);font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-size:.85rem}
+.flags{display:grid;gap:10px}
+.flag{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 10px;align-items:start;font-size:.9rem}
+.flag .sev{font-family:var(--f-display);font-weight:700;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
+.sev.high{color:var(--bad)} .sev.med{color:var(--warn)} .sev.low{color:var(--deep)}
+.steps{counter-reset:s;display:grid;gap:10px;padding:0;margin:0;list-style:none}
+.steps li{counter-increment:s;display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;font-size:.92rem}
+.steps li::before{content:counter(s);font-family:var(--f-display);font-weight:700;font-size:1.1rem;color:var(--accent)}
+.example{font-size:.8rem;color:var(--accent);font-family:var(--f-display);letter-spacing:.08em;text-transform:uppercase;font-weight:600}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><h1>SeaTrace</h1><span class="tag">Credit check</span></div>
+    <div class="site">Independent check of seaweed carbon credit claims<br><span class="num">prototype · model 2.0 · giant kelp</span></div>
+  </header>
+
+  <div class="stack" style="gap:18px">
+    <div class="stack" style="gap:6px">
+      <h2 style="font-size:clamp(1.7rem,6vw,2.4rem)">Is this seaweed farm's carbon claim believable?</h2>
+      <p class="lede muted">Enter what the seller has told you. SeaTrace estimates what the farm could plausibly have stored, compares it with the claim, and lists the evidence to ask for before you buy.</p>
+    </div>
+
+    <form class="card stack" id="f" novalidate>
+      <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline">
+        <h3>1 · The farm and its claim</h3><span class="example" id="ex-tag">Filled with an example farm</span>
+      </div>
+      <div class="form">
+        <div class="field"><label for="name">Farm name</label><input type="text" id="name" value="Example Bay Kelp Co. (illustrative)"></div>
+        <div class="field"><label for="species">Species</label>
+          <select id="species"><option value="mac" selected>Giant kelp (Macrocystis)</option><option value="other">Another seaweed</option></select>
+          <span class="hint">SeaTrace's numbers are set for giant kelp.</span></div>
+        <div class="field"><label for="line">Grow-line in the water (m)</label><input type="number" id="line" min="1" step="10" value="20000">
+          <span class="hint">Total rope length, all lines.</span></div>
+        <div class="field"><label for="harvest">Harvest weight, if known (t wet)</label><input type="number" id="harvest" min="0" step="0.1" value="200">
+          <span class="hint">Leave blank to estimate from line length.</span></div>
+        <div class="field"><label for="timing">Harvest timing</label>
+          <select id="timing"><option value="ontime" selected>Normal (before water warms)</option><option value="late">Late (into warming water)</option><option value="unknown">Unknown</option></select>
+          <span class="hint">Late harvests lose far more kelp before cutting.</span></div>
+        <div class="field"><label for="fate">What happens to the harvest</label>
+          <select id="fate"><option value="sold" selected>Sold or used (food, feed, products)</option><option value="sunk">Sunk in the deep ocean</option><option value="unknown">Unknown</option></select></div>
+        <div class="field"><label for="seabed">Seabed under the farm</label>
+          <select id="seabed"><option value="sand" selected>Sand or rock</option><option value="mud">Soft mud</option><option value="unknown">Unknown</option></select></div>
+        <div class="field"><label for="claim">Credits claimed for this season (t CO₂)</label><input type="number" id="claim" min="0" step="0.1" value="50"></div>
+      </div>
+
+      <h3 style="margin-top:6px">2 · Evidence the seller has</h3>
+      <div class="checks" id="evidence"></div>
+
+      <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" type="submit">Check this claim</button><button class="btn ghost" type="button" id="clear">Start blank</button></div>
+    </form>
+
+    <section class="stack" id="out" aria-live="polite"></section>
+  </div>
+  <p class="foot" id="foot"></p>
+</div>
+
+<script>
+const D = /*__DATA__*/null;
+const C = D.coef, PID = D.paramIds;
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmt = (x, d=1) => Number(x).toLocaleString("en-AU", {minimumFractionDigits:d, maximumFractionDigits:d});
+const co2 = t => t < 1 ? `${Math.round(t*1000).toLocaleString("en-AU")} kg` : `${fmt(t, t < 10 ? 2 : 1)} t`;
+
+/* model: same as modules/carbon.py v2 */
+function fate(p){
+  const poc = p.poc_loss_fraction, doc = p.doc_release_fraction;
+  const poc_deep = poc * p.poc_deep_fraction, buried = poc * (1 - p.poc_deep_fraction) * p.poc_burial_fraction, doc_deep = doc * p.doc_deep_fraction;
+  return {harvested: 1 - poc - doc, durable: poc_deep + buried + doc_deep};
+}
+function model(p, wet){
+  const ch = wet * p.dry_matter_fraction * p.carbon_content_fraction, f = fate(p), cf = ch / f.harvested;
+  return {wet, cf, durable_co2: cf * f.durable * D.co2PerC, f};
+}
+function rng(seed){ let a = seed >>> 0; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function draw(u, lo, m, hi, dist){
+  if (dist === "triangular"){ const F = (m-lo)/(hi-lo); return u < F ? lo + Math.sqrt(u*(hi-lo)*(m-lo)) : hi - Math.sqrt((1-u)*(hi-lo)*(hi-m)); }
+  return lo + u*(hi-lo);
+}
+const q = (a, p) => { const i = (a.length-1)*p, l = Math.floor(i), h = Math.ceil(i); return a[l] + (a[h]-a[l])*(i-l); };
+
+/* late harvest: Fieler et al. 2021, August harvest 49.4% lost (95% CI 34.4-70.8%), capped so losses stay below 100% */
+const LATE = D.late;
+function simulate(inp, n = 5000, seed = 41){
+  const R = rng(seed), out = new Float64Array(n);
+  for (let i = 0; i < n; i++){
+    const p = {};
+    for (const [k, id] of Object.entries(PID)){ const c = C[id]; p[k] = draw(R(), c.low, +c.value, c.high, c.dist); }
+    if (inp.timing === "late") p.poc_loss_fraction = draw(R(), LATE.low, LATE.mode, LATE.high, "triangular");
+    if (inp.timing === "unknown") p.poc_loss_fraction = R() < .5 ? p.poc_loss_fraction : draw(R(), LATE.low, LATE.mode, LATE.high, "triangular");
+    const wet = inp.harvest > 0 ? inp.harvest : inp.line * p.yield_kg_per_m / 1000;
+    out[i] = model(p, wet).durable_co2;
+  }
+  out.sort();
+  return {p5: q(out,.05), median: q(out,.5), p95: q(out,.95), max: out[n-1], samples: out};
+}
+
+const EVIDENCE = [
+  ["ev-harvest","Weighed harvest records, line by line","Replaces the biggest assumption: how much kelp grew.","Share weighed harvest records, line by line"],
+  ["ev-erosion","Erosion measured on the crop (e.g. tagged plants)","Replaces borrowed loss rates (N-23).","Measure how much kelp breaks off during the season"],
+  ["ev-doc","Dissolved carbon release measured","Replaces borrowed DOC rates (N-24).","Measure dissolved carbon released by the crop"],
+  ["ev-traps","Sediment traps or cores at and away from the farm","Shows where lost kelp actually settles.","Put sediment traps or cores at and away from the farm"],
+  ["ev-water","Water carbon chemistry around the farm","Needed to show CO₂ was drawn from the air.","Measure water carbon chemistry around the farm"],
+  ["ev-lca","Life-cycle emissions (boats, moorings, processing)","Must be subtracted from any credit.","Account for boat, mooring and processing emissions"],
+  ["ev-audit","Independent third-party audit","No approved seaweed methodology exists yet.","Commission an independent audit of the claim"],
+];
+$("#evidence").innerHTML = EVIDENCE.map(([id, l, h]) => `<label for="${id}"><input type="checkbox" id="${id}" ${id === "ev-harvest" ? "checked" : ""}><span>${l}<br><span class="muted" style="font-size:.78rem">${h}</span></span></label>`).join("");
+
+function read(){
+  const num = id => { const v = parseFloat($("#"+id).value); return isFinite(v) && v >= 0 ? v : 0; };
+  return {name: $("#name").value.trim() || "This farm", species: $("#species").value, line: num("line"), harvest: num("harvest"),
+    timing: $("#timing").value, fate: $("#fate").value, seabed: $("#seabed").value, claim: num("claim"),
+    ev: Object.fromEntries(EVIDENCE.map(([id]) => [id, $("#"+id).checked]))};
+}
+
+function assess(inp){
+  const r = simulate(inp);
+  const ratio = inp.claim / r.median;
+  let verdict;
+  if (inp.claim <= 0) verdict = {cls:"warn", tag:"No claim entered", head:"Enter the seller's claim to compare it.", body:""};
+  else if (inp.claim <= r.p95) verdict = {cls:"good", tag:"Within range", head:`The claim sits inside what SeaTrace finds plausible.`, body:`${co2(inp.claim)} is below the 95th percentile (${co2(r.p95)}). That makes it believable, not proven: the evidence list below still applies.`};
+  else if (inp.claim <= r.max) verdict = {cls:"warn", tag:"Above the likely range", head:`The claim is higher than 95% of SeaTrace's outcomes.`, body:`${co2(inp.claim)} is ${fmt(ratio,0)}× SeaTrace's median. Possible only if several inputs sit at their most favourable ends at once. Ask the seller which measurements support it.`};
+  else verdict = {cls:"bad", tag:"Not supported", head:`The claim exceeds every one of 5,000 SeaTrace runs.`, body:`${co2(inp.claim)} is ${fmt(ratio,0)}× SeaTrace's median and above its highest run (${co2(r.max)}). The seller is likely counting carbon that isn't stored, such as the harvested kelp or all carbon the crop absorbed.`};
+
+  const flags = [];
+  const absorbed = (inp.harvest > 0 ? inp.harvest : inp.line * C["N-15"].value / 1000) * C["N-13"].value * C["N-01"].value / fate(Object.fromEntries(Object.entries(PID).map(([k,id]) => [k, +C[id].value]))).harvested * D.co2PerC;
+  if (inp.claim > 0 && inp.claim >= absorbed * 0.5) flags.push(["high", "Claim close to everything the kelp absorbed", `The crop absorbed roughly ${co2(absorbed)} of CO₂ in total. A claim of ${co2(inp.claim)} implies most of it was stored, but most leaves in the harvest or rots.`, "Explain how the claim was calculated and which carbon it counts"]);
+  if (inp.species !== "mac") flags.push(["med", "Species not covered", "SeaTrace's coefficients are set for giant kelp. Treat this result as indicative only.", "Provide species-specific growth and carbon data"]);
+  if (!(inp.harvest > 0)) flags.push(["med", "No harvest weight", `Biomass was estimated from line length at 1.2–12 kg per metre. Weighed harvests would narrow the range a lot.`, "Provide weighed harvest records, line by line"]);
+  if (inp.timing === "late") flags.push(["low", "Late harvest", "More kelp breaks off before cutting, which raises stored carbon but also raises uncertainty about where it went.", "Give the exact harvest date"]);
+  if (inp.timing === "unknown") flags.push(["med", "Harvest timing unknown", "Losses differ about fourfold between a normal and a late harvest; SeaTrace allowed for both.", "Give the exact harvest date"]);
+  if (inp.fate === "sunk") flags.push(["high", "Deliberate sinking is not modelled", "Sunk harvests need a sinking-specific method with proof of depth and permanence. SeaTrace's range excludes the sunk kelp.", "Show the sinking depth, method and how permanence is proven"]);
+  if (inp.fate === "unknown") flags.push(["med", "Fate of the harvest unknown", "If the harvest is counted as stored, the claim is invalid unless it was sunk in deep water and verified.", "State in writing what happened to the harvest"]);
+  if (inp.seabed === "sand") flags.push(["low", "Sandy or rocky seabed", "Little settles to be buried. Published farm burial rates come from muddy, depositional sites."]);
+  if (inp.seabed === "unknown") flags.push(["low", "Seabed type unknown", "Burial depends on it; ask for a seabed survey."]);
+  EVIDENCE.forEach(([id, l, h, ask]) => { if (!inp.ev[id]) flags.push([id === "ev-water" || id === "ev-audit" || id === "ev-harvest" ? "high" : "med", `Missing: ${l.toLowerCase()}`, h, ask]); });
+  const order = {high:0, med:1, low:2}; flags.sort((a,b) => order[a[0]] - order[b[0]]);
+  return {r, verdict, flags, absorbed};
+}
+
+function render(){
+  const inp = read(), {r, verdict, flags, absorbed} = assess(inp);
+  const hi = Math.max(r.p95, inp.claim, r.max*0) * 1.12 || 1, X = v => Math.min(100, v / hi * 100);
+  const have = EVIDENCE.filter(([id]) => inp.ev[id]).length;
+  const asks = [...new Set(flags.filter(f => f[3]).map(f => f[3]))].slice(0, 6);
+  $("#out").innerHTML = `
+    <h3>3 · SeaTrace's assessment of ${esc(inp.name)}</h3>
+    <div class="verdict ${verdict.cls}"><span class="tag">${verdict.tag}</span><h3>${verdict.head}</h3>${verdict.body ? `<p style="font-size:.92rem">${verdict.body}</p>` : ""}</div>
+    <div class="card stack">
+      <div style="display:flex;gap:28px;flex-wrap:wrap">
+        <div><span class="eyebrow">SeaTrace estimate</span><div class="big num" style="font-size:2.6rem">${co2(r.median)}</div><span class="muted" style="font-size:.85rem">CO₂ stored, most likely</span></div>
+        <div><span class="eyebrow">Likely range</span><div class="num" style="font-size:1.4rem;margin-top:8px">${co2(r.p5)} – ${co2(r.p95)}</div><span class="muted" style="font-size:.85rem">90% of 5,000 runs</span></div>
+        <div><span class="eyebrow">Seller claims</span><div class="num" style="font-size:1.4rem;margin-top:8px;color:var(--accent)">${inp.claim > 0 ? co2(inp.claim) : "–"}</div><span class="muted" style="font-size:.85rem">${inp.claim > 0 ? fmt(inp.claim / r.median, 1) + "× the estimate" : ""}</span></div>
+      </div>
+      <div class="rangebar" aria-label="SeaTrace range compared with the claim">
+        <div class="track"></div>
+        <div class="span" style="left:${X(r.p5)}%;width:${X(r.p95)-X(r.p5)}%"></div>
+        <div class="tick" style="left:${X(r.median)}%"></div>
+        ${inp.claim > 0 ? `<div class="pt" style="left:${X(inp.claim)}%" title="Claim"></div>` : ""}
+        ${X(r.p95) - X(r.p5) < 22 ? `<div class="lab" style="left:${Math.max(12, (X(r.p5) + X(r.p95)) / 2)}%">${co2(r.p5)}–${co2(r.p95)}</div>` : `<div class="lab" style="left:${X(r.p5)}%">${co2(r.p5)}</div><div class="lab" style="left:${X(r.p95)}%">${co2(r.p95)}</div>`}
+        ${inp.claim > 0 && X(inp.claim) > X(r.p95) + 12 ? `<div class="lab" style="left:${X(inp.claim)}%;color:var(--accent)">claim</div>` : ""}
+      </div>
+      <p class="muted" style="font-size:.82rem">For scale: the crop absorbed roughly ${co2(absorbed)} of CO₂ in total. About two-thirds leaves in a normal harvest, and most of what breaks off rots.${inp.fate === "sunk" ? " The sunk harvest is not included." : ""} Figures are before any allowance for the sea re-absorbing CO₂ from the air.</p>
+    </div>
+    <div class="grid2">
+      <div class="card stack"><h3>Red flags</h3><div class="flags">${flags.length ? flags.map(([s, t, d]) => `<div class="flag"><span class="sev ${s}">${s === "med" ? "medium" : s}</span><div><b>${esc(t)}</b><br><span class="muted">${esc(d)}</span></div></div>`).join("") : '<p class="muted">None found.</p>'}</div></div>
+      <div class="card stack"><h3>Before you buy, ask the seller to</h3><ol class="steps">${asks.length ? asks.map(a => `<li><span>${esc(a)}.</span></li>`).join("") : "<li><span>Confirm the evidence they ticked can be shared with an auditor.</span></li>"}</ol>
+        <p class="muted" style="font-size:.82rem">Evidence provided: ${have} of ${EVIDENCE.length}. No seaweed carbon methodology is approved yet (Verra M0172 is in draft), so no credit can currently be certified.</p></div>
+    </div>
+    <div class="card stack">
+      <div style="display:flex;justify-content:space-between;align-items:end;gap:12px;flex-wrap:wrap"><h3>Summary to share</h3><button class="btn ghost" type="button" id="copy">Copy summary</button></div>
+      <pre class="report" id="sum" tabindex="0"></pre><span class="muted" id="copy-msg" style="font-size:.85rem"></span>
+    </div>`;
+  const sum = [
+    `SeaTrace credit check: ${inp.name}`,
+    `Prototype, model 2.0. Not a certification.`, ``,
+    `Seller's claim: ${inp.claim > 0 ? co2(inp.claim) + " CO2" : "not entered"}`,
+    `SeaTrace estimate: ${co2(r.median)} CO2 (90% range ${co2(r.p5)} to ${co2(r.p95)}; 5,000 runs)`,
+    `Verdict: ${verdict.tag}. ${verdict.head}`, ``,
+    `Inputs: ${inp.line.toLocaleString()} m of line; harvest ${inp.harvest > 0 ? inp.harvest + " t wet" : "estimated"}; timing ${inp.timing}; harvest ${inp.fate}; seabed ${inp.seabed}.`, ``,
+    `Red flags:`, ...flags.map(([s, t, d]) => `- [${s}] ${t}: ${d}`), ``,
+    `Method: harvested biomass x dry matter x carbon content, losses before harvest from farm studies (Fieler et al. 2021; Krause-Jensen & Duarte 2016), fate fractions from Krause-Jensen & Duarte 2016. Air-sea re-equilibration and life-cycle emissions not included.`
+  ].join("\n");
+  $("#sum").textContent = sum;
+  $("#copy").addEventListener("click", () => {
+    const msg = $("#copy-msg"), sel = () => { const rg = document.createRange(); rg.selectNodeContents($("#sum")); const s = getSelection(); s.removeAllRanges(); s.addRange(rg); msg.textContent = "Selected. Press Ctrl+C or ⌘C to copy."; };
+    try { navigator.clipboard.writeText(sum).then(() => msg.textContent = "Copied.", sel); } catch(e) { sel(); }
+  });
+}
+$("#f").addEventListener("submit", e => { e.preventDefault(); render(); $("#out").scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"}); });
+$("#f").addEventListener("input", () => { $("#ex-tag").hidden = true; });
+$("#clear").addEventListener("click", () => { ["name","line","harvest","claim"].forEach(id => $("#"+id).value = ""); EVIDENCE.forEach(([id]) => $("#"+id).checked = false); $("#ex-tag").hidden = true; $("#out").innerHTML = '<p class="muted">Fill in the farm and press Check this claim.</p>'; });
+$("#foot").innerHTML = `SeaTrace prototype · Team 41, QUT. Same model as the SeaTrace app (model 2.0, sources checked ${D.generated}). Estimates rest on published studies, not measurements of the farm checked; they are a screening tool, not a verification.`;
+render();
+</script>

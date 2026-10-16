@@ -1,0 +1,914 @@
+{
+  "generated": "2026-10-13",
+  "model_version": "2.0 (13 Oct 2026, after source verification)",
+  "farm": {
+    "name": "IMAS Scientific Research Permit site, Tower Bay, D'Entrecasteaux Channel, Tasmania",
+    "corners": [
+      [
+        -43.387917,
+        147.034183
+      ],
+      [
+        -43.389583,
+        147.039067
+      ],
+      [
+        -43.390967,
+        147.037833
+      ],
+      [
+        -43.389333,
+        147.033033
+      ]
+    ],
+    "permit_area_ha": 7.875,
+    "line_m": 360.0,
+    "species": "Macrocystis pyrifera (giant kelp)",
+    "season": "May to November 2024"
+  },
+  "headline": {
+    "durable_co2_median_t": 0.03724495883004475,
+    "durable_co2_p5_t": 0.013258659937827861,
+    "durable_co2_p95_t": 0.09384151271857705,
+    "durable_co2_point_t": 0.046296236250000004,
+    "n_iterations": 5000,
+    "seed": 41
+  },
+  "biomass": {
+    "wet_biomass_tonnes": 3.6,
+    "low_tonnes": 0.432,
+    "high_tonnes": 4.32,
+    "line_m": 360.0,
+    "method": "grow-line length (N-22, assumed) x yield per metre (N-15)",
+    "season": "May to November 2024",
+    "satellite_timing": [
+      {
+        "window": "May-Nov 2024",
+        "clear": 14
+      },
+      {
+        "window": "Jun 2025-Feb 2026",
+        "clear": 24
+      }
+    ],
+    "notes": "Tinderbox grew ~3.6 t on 360 m of line in ~6 months (Blue Economy CRC, Nov 2024). Tower Bay is assumed to have the same layout. Low end uses 1.2 kg/m from Biancacci et al. (2022). Ask IMAS for the Tower Bay line length and harvest weight."
+  },
+  "full_scale": {
+    "wet_biomass_tonnes": 94.5,
+    "low_tonnes": 78.75,
+    "high_tonnes": 157.5,
+    "method": "N-10 x N-14 (scenario only)"
+  },
+  "point_estimate": {
+    "wet_t": 3.6,
+    "dry_t": 0.36000000000000004,
+    "harvested_c_t": 0.10800000000000001,
+    "carbon_t": 0.16875,
+    "exported_t": 0.06075,
+    "buried_t": 0.0008981212500000001,
+    "deep_t": 0.011728125000000002,
+    "released_t": 0.04812375375,
+    "durable_t": 0.012626246250000002,
+    "durable_co2_t": 0.046296236250000004,
+    "fractions": {
+      "harvested": 0.64,
+      "poc_lost": 0.13,
+      "doc_released": 0.23,
+      "poc_deep": 0.0143,
+      "doc_deep": 0.0552,
+      "deep": 0.0695,
+      "buried": 0.0053222,
+      "released": 0.2851778,
+      "durable": 0.0748222
+    },
+    "retained_t": 0.10800000000000001,
+    "total_carbon_tonnes": 0.16875,
+    "durable_carbon_tonnes": 0.012626246250000002
+  },
+  "params": {
+    "yield_kg_per_m": 10.0,
+    "dry_matter_fraction": 0.1,
+    "carbon_content_fraction": 0.3,
+    "poc_loss_fraction": 0.13,
+    "doc_release_fraction": 0.23,
+    "doc_deep_fraction": 0.24,
+    "poc_deep_fraction": 0.11,
+    "poc_burial_fraction": 0.046
+  },
+  "season": [
+    {
+      "month": "May",
+      "standing_wet_t": 0.06875377191049786,
+      "growth_wet_t": 0.06875377191049786,
+      "carbon_t": 0.0032228330583045873,
+      "durable_co2_t": 0.0008841780187352842
+    },
+    {
+      "month": "Jun",
+      "standing_wet_t": 0.27976081539851444,
+      "growth_wet_t": 0.21100704348801658,
+      "carbon_t": 0.009890955163500777,
+      "durable_co2_t": 0.002713564426593122
+    },
+    {
+      "month": "Jul",
+      "standing_wet_t": 0.8328759279829651,
+      "growth_wet_t": 0.5531151125844507,
+      "carbon_t": 0.025927270902396122,
+      "durable_co2_t": 0.007113096646015298
+    },
+    {
+      "month": "Aug",
+      "standing_wet_t": 1.8343768859552492,
+      "growth_wet_t": 1.0015009579722842,
+      "carbon_t": 0.04694535740495082,
+      "durable_co2_t": 0.012879368043023942
+    },
+    {
+      "month": "Sep",
+      "standing_wet_t": 2.8358778439275327,
+      "growth_wet_t": 1.0015009579722836,
+      "carbon_t": 0.04694535740495079,
+      "durable_co2_t": 0.012879368043023934
+    },
+    {
+      "month": "Oct",
+      "standing_wet_t": 3.388992956511984,
+      "growth_wet_t": 0.5531151125844511,
+      "carbon_t": 0.025927270902396146,
+      "durable_co2_t": 0.007113096646015305
+    },
+    {
+      "month": "Nov",
+      "standing_wet_t": 3.6,
+      "growth_wet_t": 0.21100704348801624,
+      "carbon_t": 0.009890955163500761,
+      "durable_co2_t": 0.002713564426593118
+    }
+  ],
+  "stages": [
+    {
+      "stage": "wet_t",
+      "label": "Kelp harvested (wet)",
+      "unit": "t",
+      "p5": 1.209674345587682,
+      "median": 2.917047964286282,
+      "p95": 3.952074337922359,
+      "mean": 2.786285048247234
+    },
+    {
+      "stage": "dry_t",
+      "label": "Kelp harvested (dry)",
+      "unit": "t",
+      "p5": 0.10622100411932647,
+      "median": 0.26074856333260793,
+      "p95": 0.3925802561236657,
+      "mean": 0.2563061078548365
+    },
+    {
+      "stage": "carbon_t",
+      "label": "Carbon fixed by the kelp",
+      "unit": "t C",
+      "p5": 0.053770703500040075,
+      "median": 0.1322441484585662,
+      "p95": 0.23716103582518538,
+      "mean": 0.13704256738127607
+    },
+    {
+      "stage": "exported_t",
+      "label": "Carbon lost before harvest",
+      "unit": "t C",
+      "p5": 0.019550661413282232,
+      "median": 0.053838615771478415,
+      "p95": 0.13603066909884887,
+      "mean": 0.06273430576140229
+    },
+    {
+      "stage": "durable_t",
+      "label": "Durable carbon",
+      "unit": "t C",
+      "p5": 0.0036159981648621444,
+      "median": 0.01015771604455766,
+      "p95": 0.0255931398323392,
+      "mean": 0.01180794036794194
+    },
+    {
+      "stage": "durable_co2_t",
+      "label": "Durable CO2",
+      "unit": "t CO2",
+      "p5": 0.013258659937827861,
+      "median": 0.03724495883004475,
+      "p95": 0.09384151271857705,
+      "mean": 0.043295781349120446
+    }
+  ],
+  "scenarios": [
+    {
+      "name": "Central",
+      "why": "Tinderbox-sized trial (360 m of line, 10 kg/m), farm loss rates from Norwegian kelp farms.",
+      "wet_t": 3.6,
+      "durable_fraction": 0.0748222,
+      "buried": 0.0053222,
+      "deep": 0.0695,
+      "released": 0.2851778,
+      "durable_co2_t": 0.046296236250000004,
+      "change_vs_central": 0.0
+    },
+    {
+      "name": "Late harvest",
+      "why": "Harvest delayed into warming water: 49% lost as pieces, as measured when a Norwegian farm harvested in August.",
+      "wet_t": 3.6,
+      "durable_fraction": 0.12916060000000001,
+      "buried": 0.020060599999999998,
+      "deep": 0.1091,
+      "released": 0.5908394,
+      "durable_co2_t": 0.18266999142857146,
+      "change_vs_central": 2.9456769324001244
+    },
+    {
+      "name": "Low growth",
+      "why": "Yield of 1.2 kg/m, the mean for farmed giant kelp at two Tasmanian sites in 2020 (Biancacci et al. 2022).",
+      "wet_t": 0.432,
+      "durable_fraction": 0.0748222,
+      "buried": 0.0053222,
+      "deep": 0.0695,
+      "released": 0.2851778,
+      "durable_co2_t": 0.00555554835,
+      "change_vs_central": -0.88
+    },
+    {
+      "name": "Dissolved carbon upper case",
+      "why": "33% of dissolved carbon reaches deep water, the upper boundary in Krause-Jensen & Duarte (2016).",
+      "wet_t": 3.6,
+      "durable_fraction": 0.0955222,
+      "buried": 0.0053222,
+      "deep": 0.0902,
+      "released": 0.2644778,
+      "durable_co2_t": 0.05910436125,
+      "change_vs_central": 0.27665585882264887
+    },
+    {
+      "name": "Sheltered channel",
+      "why": "Tower Bay sits in a sheltered ~15 m channel: deep export at the low end for both pieces and dissolved carbon.",
+      "wet_t": 3.6,
+      "durable_fraction": 0.046681,
+      "buried": 0.005680999999999999,
+      "deep": 0.041,
+      "released": 0.313319,
+      "durable_co2_t": 0.02888386875,
+      "change_vs_central": -0.37610762581159074
+    },
+    {
+      "name": "Full-scale farm",
+      "why": "If the whole 7.9 ha permit area held kelp at wild Tasmanian forest density (12 t/ha). Not what the trial did; shows the scale-up.",
+      "wet_t": 94.5,
+      "durable_fraction": 0.0748222,
+      "buried": 0.0053222,
+      "deep": 0.0695,
+      "released": 0.2851778,
+      "durable_co2_t": 1.2152762015625003,
+      "change_vs_central": 25.250000000000004
+    }
+  ],
+  "sensitivity": {
+    "central": 0.046296236250000004,
+    "rows": [
+      {
+        "param": "poc_loss_fraction",
+        "label": "Kelp lost as pieces before harvest (N-23)",
+        "id": "N-23",
+        "low_value": 0.08,
+        "high_value": 0.49,
+        "co2_at_low": 0.0386101147826087,
+        "co2_at_high": 0.18266999142857146,
+        "swing": 0.14405987664596276
+      },
+      {
+        "param": "yield_kg_per_m",
+        "label": "Kelp grown per metre of line (N-15)",
+        "id": "N-15",
+        "low_value": 1.2,
+        "high_value": 12.0,
+        "co2_at_low": 0.00555554835,
+        "co2_at_high": 0.055555483500000016,
+        "swing": 0.049999935150000015
+      },
+      {
+        "param": "doc_release_fraction",
+        "label": "Carbon released dissolved (N-24)",
+        "id": "N-24",
+        "low_value": 0.12,
+        "high_value": 0.29,
+        "co2_at_low": 0.025566921600000004,
+        "co2_at_high": 0.06091722620689655,
+        "swing": 0.035350304606896546
+      },
+      {
+        "param": "dry_matter_fraction",
+        "label": "Dry matter fraction (N-13)",
+        "id": "N-13",
+        "low_value": 0.055,
+        "high_value": 0.12,
+        "co2_at_low": 0.025462929937500003,
+        "co2_at_high": 0.0555554835,
+        "swing": 0.0300925535625
+      },
+      {
+        "param": "doc_deep_fraction",
+        "label": "Dissolved carbon reaching deep water (N-18)",
+        "id": "N-18",
+        "low_value": 0.15,
+        "high_value": 0.33,
+        "co2_at_low": 0.03348811125,
+        "co2_at_high": 0.05910436125,
+        "swing": 0.02561625
+      },
+      {
+        "param": "carbon_content_fraction",
+        "label": "Carbon content (N-01)",
+        "id": "N-01",
+        "low_value": 0.24,
+        "high_value": 0.33,
+        "co2_at_low": 0.037036989000000006,
+        "co2_at_high": 0.05092585987500001,
+        "swing": 0.013888870875
+      },
+      {
+        "param": "poc_deep_fraction",
+        "label": "Pieces reaching deep sea (N-04)",
+        "id": "N-04",
+        "low_value": 0.05,
+        "high_value": 0.17,
+        "co2_at_low": 0.041691993749999996,
+        "co2_at_high": 0.050900478750000006,
+        "swing": 0.00920848500000001
+      },
+      {
+        "param": "poc_burial_fraction",
+        "label": "Pieces buried on shelf (N-05)",
+        "id": "N-05",
+        "low_value": 0.02,
+        "high_value": 0.06,
+        "co2_at_low": 0.0444349125,
+        "co2_at_high": 0.04729848750000001,
+        "swing": 0.002863575000000007
+      }
+    ]
+  },
+  "validation": [
+    {
+      "check": "Fate tree reproduces the published global budget",
+      "ours": 0.108942016,
+      "published": 0.11374095989480605,
+      "unit": "share",
+      "source": "Krause-Jensen & Duarte (2016), Nature Geoscience: 173 of 1,521 TgC/yr of macroalgal NPP sequestered",
+      "verdict": "match",
+      "explanation": "Run with the paper's own inputs, our fate code gives 10.9% against the paper's 11.4%. The half-point gap comes from the paper rounding and listing 30% and 33% for the same DOC step, so the structure is coded correctly."
+    },
+    {
+      "check": "Share of fixed carbon stored, farm vs wild forest",
+      "ours": 0.0748222,
+      "published": 0.11374095989480605,
+      "unit": "share",
+      "source": "Krause-Jensen & Duarte (2016) for wild forests; Duarte et al. (2017) note the share is likely smaller for farms because the crop is harvested",
+      "verdict": "lower, as expected",
+      "explanation": "We store about 7.5% of the carbon the kelp fixes, versus about 11% in wild forests. The difference is the harvest: about 64% of fixed carbon is taken away and sold."
+    },
+    {
+      "check": "Kelp grown, compared with the sister site",
+      "ours": 3.6,
+      "published": 3.6,
+      "unit": "t",
+      "source": "Blue Economy CRC (Nov 2024): ~3.6 t grown at Tinderbox on 360 m of line; Biancacci et al. (2022): 1.2 kg/m at other Tasmanian farms",
+      "verdict": "assumed equal",
+      "explanation": "Tower Bay is assumed to match Tinderbox. Nothing public gives the Tower Bay line length or harvest weight, so this check is circular until IMAS supplies them."
+    },
+    {
+      "check": "Kelp lost before harvest",
+      "ours": 0.13,
+      "published": 0.13,
+      "unit": "share",
+      "source": "Fieler et al. (2021), farmed Saccharina in Norway: 8-13% lost by a normal harvest, 49% when delayed",
+      "verdict": "transferred",
+      "explanation": "Central value is taken from this study, so it matches by construction. The check is that it is a farm measurement, unlike the 71% wild-forest figure used before."
+    },
+    {
+      "check": "Full-scale farm: CO2 stored per hectare",
+      "ours": 0.15432078750000003,
+      "published": 1.06,
+      "unit": "t CO2/ha",
+      "source": "Duarte et al. (2025), Nature Climate Change: sediment burial attributable to 20 seaweed farms averaged 1.06 t CO2e/ha/yr; Bayley et al. (2017): wild Falklands giant kelp ~3.6 t CO2/ha/yr",
+      "verdict": "lower",
+      "explanation": "Even if the whole site were farmed, we estimate well under the 20-farm average. Wild-forest density (12 t/ha) is low for a farm, and our share buried on a sandy channel floor is small."
+    },
+    {
+      "check": "Share of lost carbon released again",
+      "ours": 0.7921605555555555,
+      "published": 0.9,
+      "unit": "share",
+      "source": "N-06 cross-check: deep-ocean monitoring and lab studies report more than 90% remineralisation",
+      "verdict": "disagrees",
+      "explanation": "About 79% of the carbon lost before harvest is released again, against more than 90% from monitoring. If monitoring is right, stored carbon is roughly half our central value."
+    }
+  ],
+  "dispersion": {
+    "decay_per_day": 0.075,
+    "flushing_days": 23.0,
+    "north_share": 0.75,
+    "farm": [
+      [
+        -43.387917,
+        147.034183
+      ],
+      [
+        -43.389583,
+        147.039067
+      ],
+      [
+        -43.390967,
+        147.037833
+      ],
+      [
+        -43.389333,
+        147.033033
+      ]
+    ],
+    "intact_at_exit": 0.17817305177289844,
+    "intact_at_exit_range": [
+      0.08733534760288081,
+      0.8512920711071511
+    ],
+    "settles_in_channel": 0.8218269482271016,
+    "seabed": "Lines ~5 or 10 m below surface; ~15 m water over sand",
+    "notes": "Detritus that rots inside the channel releases its carbon locally; a small share of the particles settles on the sandy seabed (~15 m) and may be buried (N-05). Pieces flushed out reach Storm Bay or the southern entrance, not yet the deep ocean."
+  },
+  "coefficients": {
+    "N-01": {
+      "parameter": "Carbon content of biomass",
+      "plain_english": "If you dry the kelp, what fraction of what's left is carbon.",
+      "value": 0.3,
+      "low": 0.24,
+      "high": 0.33,
+      "dist": "triangular",
+      "unit": "fraction of dry weight",
+      "range": "0.24 - 0.33",
+      "source": "Reed & Brzezinski (2009): ~30% of Macrocystis dry weight is carbon (as used by Bayley et al. 2017, Falklands). SBC LTER data imply ~28% and note 20-40% variation (Rassweiler et al. 2008). 0.3217 (Reed & Miller 2021, via Gould et al. 2025) kept as the upper end; not independently re-checked 13 Oct 2026.",
+      "original_region": "California - Macrocystis pyrifera",
+      "type": "Transferred region",
+      "transferred": true,
+      "how_solid": "GOOD species match, several consistent sources (0.28-0.32). Not measured on Tasmanian farmed kelp.",
+      "owner": "Khushi",
+      "verified": "13 Oct 2026: 30% (Reed & Brzezinski 2009) confirmed via Bayley et al. 2017; ~28% from SBC LTER dataset. Changed central from 0.3217 to 0.30."
+    },
+    "N-02": {
+      "parameter": "Detrital decay rate",
+      "plain_english": "Once a piece of kelp breaks off, how fast it rots away.",
+      "value": 0.075,
+      "low": 0.007,
+      "high": 0.106,
+      "dist": "loguniform",
+      "unit": "per day",
+      "range": "0.007 - 0.106 (widened 2 Oct 2026)",
+      "source": "0.075/day: Ecklonia radiata detritus, WA shelf (Filbee-Dexter / van der Mheen work, primary paper to verify). Lower bound: Filbee-Dexter et al. (2020), ~0.74%/day mean across 35 sites.",
+      "original_region": "Western Australia continental shelf",
+      "type": "Transferred species",
+      "transferred": true,
+      "how_solid": "WEAK - transferred across species (Ecklonia -> Macrocystis) and region (WA -> Tasmania). Published rates disagree ~10x, so sampled log-uniformly. Used only for the dispersion footprint.",
+      "owner": "Khushi",
+      "verified": "13 Oct 2026: primary source for 0.075/day not found. Filbee-Dexter et al. 2024 did not use per-day rates; Smale et al. 2022 found Laminaria detritus can take >4 months to decompose (slower). Display only."
+    },
+    "N-03": {
+      "parameter": "Detritus export fraction (wild forests)",
+      "plain_english": "In a wild kelp forest, how much of everything it grows breaks off as detritus. Not used for the farm, where most kelp is harvested.",
+      "value": 0.71,
+      "low": 0.65,
+      "high": 0.77,
+      "dist": "fixed",
+      "unit": "fraction of net primary production",
+      "range": "0.71 +/- 0.06 SE",
+      "source": "Filbee-Dexter et al. (2024), Carbon export from seaweed forests to deep ocean sinks, Nature Geoscience: 'the fraction of the production that is exported as detritus (71% +/- 6 SE)'.",
+      "original_region": "Global synthesis of wild seaweed forests",
+      "type": "Literature-derived",
+      "transferred": true,
+      "how_solid": "VERIFIED value, but it applies to wild forests, not farms. Replaced in the farm model by N-23 and N-24 (13 Oct 2026). Used only in the wild-forest comparison.",
+      "owner": "Khushi",
+      "verified": "13 Oct 2026: value confirmed in the paper. Misapplied to a farm before; now comparison only."
+    },
+    "N-04": {
+      "parameter": "POC exported to deep sea",
+      "plain_english": "Of the kelp pieces that drift away, how much sinks to deep water where the carbon stays locked up.",
+      "value": 0.11,
+      "low": 0.05,
+      "high": 0.17,
+      "dist": "uniform",
+      "unit": "fraction of exported POC",
+      "range": "0.05 - 0.17 (assumed; low end = N-07 sheltered-channel case)",
+      "source": "Krause-Jensen & Duarte (2016), Nature Geoscience 9, 737-742: about 11% of POC export (35 TgC/yr) reaches the deep sea.",
+      "original_region": "Global",
+      "type": "Literature-derived",
+      "transferred": true,
+      "how_solid": "VERIFIED value and basis (fraction of POC export). Global; a sheltered 15 m channel probably exports less, hence the low end.",
+      "owner": "Khushi",
+      "verified": "13 Oct 2026: 11% of POC export confirmed in the paper."
+    },
+    "N-05": {
+      "parameter": "POC buried in shelf sediment",
+      "plain_english": "Of the kelp pieces that stay on the shelf, how much settles into the seabed and stays there.",
+      "value": 0.046,
+      "low": 0.02,
+      "high": 0.06,
+      "dist": "uniform",
+      "unit": "fraction of POC retained on the shelf",
+      "range": "0.02 - 0.06 (assumed)",
+      "source": "Krause-Jensen & Duarte (2016): of the 89% of POC export retained on the shelf, 'an estimated 4.6% (14 TgC/yr) is buried in shelf sediments'.",
+      "original_region": "Global",
+      "type": "Literature-derived",
+      "transferred": true,
+      "how_solid": "VERIFIED value and basis. Khushi's 0.046 was right; the old Notion row (0.04 of exported POC) had the wrong basis.",
+      "owner": "Khushi",
+      "verified": "13 Oct 2026: 4.6% of shelf-retained POC confirmed in the paper."
+    },
+    "N-06": {
+      "parameter": "Remineralised fraction",
+      "plain_english": "Everything else: eaten or rotted, so the carbon goes back to the water and air. No climate benefit.",
+      "value": "calculate as residual",
+      "low": null,
+      "high": null,
+      "dist": "fixed",
+      "unit": "fraction of exported carbon",
+      "range": "wide",
+      "source": "Residual of the fate tree. Cross-check: deep ocean monitoring reports >90% remineralisation.",
+      "original_region": "n/a",
+      "type": "Derived",
+      "transferred": false,
+      "how_solid": "UNCERTAIN. Our tree implies ~80%; lab studies suggest >90%. That gap is reported as uncertainty, not resolved away.",
+      "owner": "Khushi",
+      "verified": "13 Oct 2026: residual, no source needed. Monitoring >90% cross-check not re-checked."
+    },
+    "N-07": {
+      "parameter": "Cross-shelf export with decay",
+      "plain_english": "How much detritus gets past the continental shelf edge after rotting on the way.",
+      "value": 0.21,
+      "low": 0.05,
+      "high": 0.51,
+      "dist": "uniform",
+      "unit": "fraction",
+      "range": "0.05 - 0.51 (widened 2 Oct 2026)",
+      "source": "van der Mheen et al. (2024), Scientific Reports 14: 51%/yr passes the shelf edge, 17-29% after decomposition.",
+      "original_region": "Western Australia continental shelf",
+      "type": "Transferred species",
+      "transferred": true,
+      "how_solid": "WEAK - open WA shelf vs sheltered D'Entrecasteaux Channel. Used in the 'sheltered channel' sensitivity scenario.",
+      "owner": "Khushi",
+      "verified": "13 Oct 2026: 51%/yr past the shelf edge, 17-29% with decomposition, confirmed (van der Mheen et al. 2024 abstract)."
+    },
+    "N-08": {
+      "parameter": "Growing season window",
+      "plain_english": "When the kelp was in the water growing at Tower Bay.",
+      "value": "May to November 2024",
+      "low": null,
+      "high": null,
+      "dist": "fixed",
+      "months": [
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov"
+      ],
+      "unit": "months",
+      "range": "n/a",
+      "source": "Blue Economy CRC harvest note (22 Nov 2024): Tinderbox harvested ~6 months after outplanting; Tower Bay due for harvest the following week. Matches N-12 (14 clear scenes May-Nov 2024). Biancacci et al. (2022): April deployment, harvest window July-August in other Tasmanian sites.",
+      "original_region": "Southeast Tasmania",
+      "type": "Measured",
+      "transferred": false,
+      "how_solid": "GOOD for the 2024 trial. The 2023-24 trial was killed by the summer heatwave; the 2025-26 trial ran Jun-Feb. Was 'April - August' before 13 Oct 2026, which did not match Tower Bay.",
+      "owner": "Moniesh",
+      "verified": "13 Oct 2026: changed from April-August to the 2024 trial window."
+    },
+    "N-09": {
+      "parameter": "Farm location",
+      "plain_english": "Exactly where the farm is.",
+      "value": [
+        [
+          -43.387917,
+          147.034183
+        ],
+        [
+          -43.389583,
+          147.039067
+        ],
+        [
+          -43.390967,
+          147.037833
+        ],
+        [
+          -43.389333,
+          147.033033
+        ]
+      ],
+      "centroid": [
+        -43.38945,
+        147.036029
+      ],
+      "low": null,
+      "high": null,
+      "dist": "fixed",
+      "unit": "lat / lon (WGS84)",
+      "range": "n/a",
+      "source": "MAST Notice to Mariners M276-26(T), D'Entrecasteaux Channel, Tower Bay - Mooring Works, 4 Aug 2026.",
+      "original_region": "Southeast Tasmania",
+      "type": "Measured",
+      "transferred": false,
+      "how_solid": "GOOD - authoritative government source. IMAS Scientific Research Permit site, active to 30 July 2027.",
+      "owner": "Ramesh",
+      "verified": "13 Oct 2026: all four corners confirmed against MAST M276-26(T) and M178-21(T). Notice describes the permit area only, not the kelp infrastructure."
+    },
+    "N-10": {
+      "parameter": "Farm area",
+      "plain_english": "How big the farm is.",
+      "value": 7.875,
+      "low": null,
+      "high": null,
+      "dist": "fixed",
+      "unit": "hectares",
+      "range": "n/a",
+      "source": "Shoelace formula on the N-09 corners (~436 x 184 m).",
+      "original_region": "Southeast Tasmania",
+      "type": "Measured",
+      "transferred": false,
+      "how_solid": "GOOD - derived from an authoritative coordinate source. ~787 Sentinel-2 pixels.",
+      "owner": "Moniesh",
+      "verified": "13 Oct 2026: geodesic area of N-09 = 7.873 ha (pyproj, WGS84). This is the permit area, not the area under kelp."
+    },
+    "N-11": {
+      "parameter": "Modelled species",
+      "plain_english": "Which seaweed we model.",
+      "value": "Macrocystis pyrifera (giant kelp)",
+      "low": null,
+      "high": null,
+      "dist": "fixed",
+      "unit": "n/a",
+      "range": "n/a",
+      "source": "Confirmed by Jeffrey Wright (IMAS) by email: three successful Macrocystis trials at Tower Bay, last ended Feb 2026.",
+      "original_region": "Southeast Tasmania",
+      "type": "Measured",
+      "transferred": false,
+      "how_solid": "GOOD - resolved (B-01).",
+      "owner": "Ramesh",
+      "verified": "13 Oct 2026: IMAS email not re-checkable by Claude; CRC pages confirm Macrocystis trials at Tower Bay."
+    },
+    "N-12": {
+      "parameter": "Usable Sentinel-2 scenes",
+      "plain_english": "How many clear satellite images cover the farm during a trial.",
+      "value": "14 clear (May-Nov 2024); 24 clear (Jun 2025-Feb 2026)",
+      "scenes": [
+        {
+          "window": "May-Nov 2024",
+          "clear": 14
+        },
+        {
+          "window": "Jun 2025-Feb 2026",
+          "clear": 24
+        }
+      ],
+      "low": null,
+      "high": null,
+      "dist": "fixed",
+      "unit": "scenes per trial",
+      "range": "n/a",
+      "source": "Copernicus Browser statistical time series, Sentinel-2 L2A over the N-09 polygon, 161 acquisitions (redone 2 Oct 2026).",
+      "original_region": "Southeast Tasmania",
+      "type": "Measured",
+      "transferred": false,
+      "how_solid": "GOOD for counts. Kelp signal in NDVI is faint: satellite gives timing, not tonnes (Changes Log C-005).",
+      "owner": "Moniesh",
+      "verified": "13 Oct 2026: not re-checked (Copernicus counts from 2 Oct). Windows agree with the CRC harvest note."
+    },
+    "N-13": {
+      "parameter": "Dry matter fraction",
+      "plain_english": "How much of the wet kelp is solid matter rather than water.",
+      "value": 0.1,
+      "low": 0.055,
+      "high": 0.12,
+      "dist": "triangular",
+      "unit": "fraction of wet weight",
+      "range": "0.055 - 0.12",
+      "source": "Reed & Brzezinski (2009): dry weight is 10% of wet (as used by Bayley et al. 2017); Duarte et al. (2017) use 0.1; SBC LTER data imply ~0.09; FAO (North America) 88.2% water = 0.118. Low end 0.055: Forbes et al. (2025) Tasmanian harvest records (not re-checked; may describe processed kelp).",
+      "original_region": "California / North America; Tasmania for the low end",
+      "type": "Literature-derived",
+      "transferred": true,
+      "how_solid": "GOOD central (four sources at 0.09-0.12). The Tasmanian 0.055 is an outlier until its method is checked. Was central 0.055 before 13 Oct 2026.",
+      "owner": "Khushi",
+      "verified": "13 Oct 2026: 0.10 confirmed via Bayley et al. 2017 and Duarte et al. 2017. Forbes 2025 full text could not be opened."
+    },
+    "N-14": {
+      "parameter": "Kelp yield per hectare (wild forests)",
+      "plain_english": "How much kelp a hectare of wild Tasmanian forest holds. Used only for the full-scale farm scenario.",
+      "value": 12.0,
+      "low": 10.0,
+      "high": 20.0,
+      "dist": "triangular",
+      "unit": "tonnes wet per hectare",
+      "range": "10 - 20 t/ha",
+      "source": "Forbes et al. (2025) J. Phycol.: historical Tasmanian surveys 10-12 t/ha; Alginates Australia records mean 12, max 20 t/ha (not re-checked 13 Oct 2026).",
+      "original_region": "Tasmania - wild Macrocystis forests, 1970s",
+      "type": "Transferred region",
+      "transferred": true,
+      "how_solid": "Wild-forest standing crop, not a farm yield. The trial did not cover the 7.9 ha permit area, so this is no longer used for the Tower Bay estimate (13 Oct 2026); only for the 'full-scale farm' scenario.",
+      "owner": "Moniesh",
+      "verified": "13 Oct 2026: not re-checked (Forbes 2025 page did not open). Use changed to scenario only."
+    },
+    "N-15": {
+      "parameter": "Farm yield per metre of grow-line",
+      "plain_english": "Kelp grown per metre of line on the IMAS trial leases.",
+      "value": 10.0,
+      "low": 1.2,
+      "high": 12.0,
+      "dist": "triangular",
+      "unit": "kg wet per metre of line (~6 months)",
+      "range": "1.2 - 12",
+      "source": "Blue Economy CRC (22 Nov 2024): ~3.6 t of Macrocystis grown at Tinderbox on 360 m of grow-line in ~6 months = 10 kg/m. Low end: Biancacci et al. (2022) Front. Mar. Sci. 9:951538, mean 1.20 kg/m (max 1.5) for farmed Macrocystis at two Tasmanian sites, 2020.",
+      "original_region": "Southeast Tasmania - Tinderbox lease (same IMAS project as Tower Bay)",
+      "type": "Transferred region",
+      "transferred": true,
+      "how_solid": "GOOD project and species match. CORRECTED 13 Oct 2026: was 75 kg/m, from dividing the whole-lease 3.6 t by the 48 m harvested. The CRC note says 3.6 t was grown on 360 m in total.",
+      "owner": "Moniesh",
+      "verified": "13 Oct 2026: CRC article re-read; Biancacci 2022 checked."
+    },
+    "N-16": {
+      "parameter": "Grow-line depth and site water depth",
+      "plain_english": "How deep the lines sit and how deep the water is.",
+      "value": "Lines ~5 or 10 m below surface; ~15 m water over sand",
+      "line_depth_m": 7.5,
+      "water_depth_m": 15.0,
+      "low": null,
+      "high": null,
+      "dist": "fixed",
+      "unit": "metres",
+      "range": "Lines 5-10 m",
+      "source": "Blue Economy CRC, Developing Production Systems for Offshore Kelp Mariculture; Biancacci et al. (2022) Front. Mar. Sci.",
+      "original_region": "Southeast Tasmania - Tinderbox description",
+      "type": "Assumed",
+      "transferred": true,
+      "how_solid": "ASSUMED for Tower Bay from the same IMAS project. Explains the faint satellite signal.",
+      "owner": "Moniesh",
+      "verified": "13 Oct 2026: confirmed on the CRC kelp mariculture page (lines ~5 or 10 m; ~15 m water over sand at Tinderbox)."
+    },
+    "N-17": {
+      "parameter": "DOC share of exported carbon",
+      "plain_english": "Of the carbon that leaves the farm, how much leaves dissolved in the water rather than as pieces.",
+      "value": 0.52,
+      "low": 0.4,
+      "high": 0.6,
+      "dist": "uniform",
+      "unit": "fraction of exported carbon",
+      "range": "0.40 - 0.60 (assumed)",
+      "source": "Khushi's durable_fraction.py (8 Oct 2026), nested structure after Krause-Jensen & Duarte (2016). Registered 13 Oct 2026 (was mislabelled N-16 in the script).",
+      "original_region": "Global",
+      "type": "Literature-derived",
+      "transferred": true,
+      "how_solid": "OK. Central value from the fate script; range assumed. Khushi to confirm the primary source.",
+      "owner": "Khushi",
+      "verified": "13 Oct 2026: DOC = 52% of macroalgal export confirmed in Krause-Jensen & Duarte 2016. Used only in the wild-forest comparison."
+    },
+    "N-18": {
+      "parameter": "DOC reaching deep water",
+      "plain_english": "Of the dissolved carbon the kelp releases, how much reaches deep water and stays there.",
+      "value": 0.24,
+      "low": 0.15,
+      "high": 0.33,
+      "dist": "uniform",
+      "unit": "fraction of DOC",
+      "range": "0.15 - 0.33",
+      "source": "Upper end: Krause-Jensen & Duarte (2016), 33% of DOC exported below the mixed layer, which they call an upper boundary (their Table 1 lists 30%). Central 0.24 from Khushi's durable_fraction.py; no primary source found 13 Oct 2026.",
+      "original_region": "Global",
+      "type": "Assumed",
+      "transferred": true,
+      "how_solid": "WEAK central: unsourced. 0.33 is a published upper boundary. Refractory DOC literature ranges 5-78% (Watanabe et al. 2020; Neves et al. 2025).",
+      "owner": "Khushi",
+      "verified": "13 Oct 2026: 0.33 upper boundary confirmed; 0.24 unsourced. Type changed to Assumed."
+    },
+    "N-19": {
+      "parameter": "Channel flushing time",
+      "plain_english": "How many days water stays in the D'Entrecasteaux Channel before flowing out.",
+      "value": 23.0,
+      "low": 20.0,
+      "high": 26.0,
+      "dist": "uniform",
+      "unit": "days",
+      "range": "20 (winter, whole channel) - 26 (overall)",
+      "source": "CSIRO hydrodynamic model of the D'Entrecasteaux Channel (2003-06).",
+      "original_region": "D'Entrecasteaux Channel, Tasmania",
+      "type": "Literature-derived",
+      "transferred": false,
+      "how_solid": "GOOD - local model. Used only for the dispersion footprint.",
+      "owner": "Ramesh",
+      "verified": "13 Oct 2026: confirmed, CSIRO (Marine and Freshwater Research MF09134): whole-region flushing ~20-26 days."
+    },
+    "N-20": {
+      "parameter": "Share of outflow leaving north",
+      "plain_english": "Of the water leaving the channel, how much goes north to Storm Bay rather than south.",
+      "value": 0.75,
+      "low": 0.6,
+      "high": 0.9,
+      "dist": "uniform",
+      "unit": "fraction",
+      "range": "0.60 - 0.90 (assumed)",
+      "source": "CSIRO D'Entrecasteaux Channel model: most water leaves north into Storm Bay, a smaller share south. Exact split not published; 0.75 assumed.",
+      "original_region": "D'Entrecasteaux Channel, Tasmania",
+      "type": "Assumed",
+      "transferred": false,
+      "how_solid": "ASSUMED split; direction is from the CSIRO model. Display only, does not change the carbon estimate.",
+      "owner": "Ramesh",
+      "verified": "13 Oct 2026: direction confirmed (predominantly northward, small share south); CSIRO gives no percentage, so 0.75 stays assumed. CSIRO also notes the northern channel connects poorly with the rest."
+    },
+    "N-21": {
+      "parameter": "Seasonal growth curve",
+      "plain_english": "The shape of growth through the season: slow start, fast middle, levelling off.",
+      "value": 1.2,
+      "low": null,
+      "high": null,
+      "dist": "fixed",
+      "unit": "logistic rate per month (midpoint at mid-season)",
+      "range": "n/a",
+      "source": "Assumed logistic shape, scaled so end-of-season biomass equals N-10 x N-14. Satellite gives timing only (C-005).",
+      "original_region": "n/a",
+      "type": "Assumed",
+      "transferred": false,
+      "how_solid": "ASSUMED shape. Season totals don't depend on it; only the month-by-month split does.",
+      "owner": "Khushi",
+      "verified": "13 Oct 2026: assumed shape, no source needed; season totals don't depend on it."
+    },
+    "N-22": {
+      "parameter": "Grow-line length at Tower Bay",
+      "plain_english": "How many metres of kelp line were in the water.",
+      "value": 360.0,
+      "low": null,
+      "high": null,
+      "dist": "fixed",
+      "unit": "metres",
+      "range": "unknown",
+      "source": "ASSUMED equal to Tinderbox, the sister site in the same IMAS/CRC project: 360 m of grow-line on three 18 m rings and a 60 m array (Blue Economy CRC kelp mariculture page; harvest note 22 Nov 2024).",
+      "original_region": "Southeast Tasmania - Tinderbox",
+      "type": "Assumed",
+      "transferred": true,
+      "how_solid": "ASSUMED. The single biggest unknown. Ask Jeff Wright (IMAS) for the Tower Bay line length and harvest weight; both would replace this and N-15.",
+      "owner": "Moniesh",
+      "verified": "13 Oct 2026: new. Replaces 'whole 7.9 ha permit area is kelp'."
+    },
+    "N-23": {
+      "parameter": "Kelp lost from the farm as pieces",
+      "plain_english": "Share of what the farm grows that breaks off and drifts away before harvest.",
+      "value": 0.13,
+      "low": 0.08,
+      "high": 0.49,
+      "dist": "triangular",
+      "unit": "fraction of production",
+      "range": "0.08 - 0.49",
+      "source": "Fieler et al. (2021) Front. Mar. Sci. 8:632725, farmed Saccharina latissima, Norway: 8-13% of produced dry weight lost by a normal harvest; 49% when harvest was delayed to August.",
+      "original_region": "Norway - Saccharina latissima farms",
+      "type": "Transferred species",
+      "transferred": true,
+      "how_solid": "OK. Measured on real kelp farms, but a different species and region. Tower Bay was harvested in November, later in the season than Biancacci et al. recommend, so losses may sit above the central value.",
+      "owner": "Khushi",
+      "verified": "13 Oct 2026: new; checked in the paper."
+    },
+    "N-24": {
+      "parameter": "Carbon released dissolved (DOC)",
+      "plain_english": "Share of the carbon the kelp fixes that leaks out dissolved in the water.",
+      "value": 0.23,
+      "low": 0.12,
+      "high": 0.29,
+      "dist": "uniform",
+      "unit": "fraction of fixed carbon",
+      "range": "0.12 - 0.29",
+      "source": "Central: Krause-Jensen & Duarte (2016), DOC export 355 of 1,521 TgC/yr NPP (23%). Range: Neves et al. (2025), farmed Saccharina latissima, DOC release 12-29% of fixed carbon (via SINTEF summary).",
+      "original_region": "Global; Norway for the farm range",
+      "type": "Literature-derived",
+      "transferred": true,
+      "how_solid": "OK. Consistent central and farm range, but no Macrocystis farm measurement.",
+      "owner": "Khushi",
+      "verified": "13 Oct 2026: new; K-J&D figures checked in the paper, Neves et al. via SINTEF summary."
+    }
+  },
+  "transferred": [
+    "N-01",
+    "N-02",
+    "N-03",
+    "N-04",
+    "N-05",
+    "N-07",
+    "N-13",
+    "N-14",
+    "N-15",
+    "N-16",
+    "N-17",
+    "N-18",
+    "N-22",
+    "N-23",
+    "N-24"
+  ]
+}

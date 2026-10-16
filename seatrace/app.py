@@ -1,93 +1,87 @@
 """
-SeaTrace — Streamlit app shell.
+SeaTrace - Streamlit app.
 
-Wires biomass -> carbon -> uncertainty -> map into one page. This is a
-transparent, literature-informed prototype estimating carbon in seaweed
-aquaculture. It is NOT a certified MRV system - it documents its own
-assumptions, uncertainty, and limitations at every step.
-
-Run with:
     streamlit run app.py
+
+A transparent, literature-based estimate of durable carbon from the Tower Bay
+kelp trial. Not a certified MRV system: every assumption and range is shown.
 """
 
+import json
+
+import pandas as pd
 import streamlit as st
 from streamlit_folium import st_folium
 
-from config.coefficients import COEFFICIENTS, list_blocking
-from modules.biomass import get_biomass
-from modules.carbon import biomass_to_carbon
+from config.coefficients import COEFFICIENTS
 from modules.mapping import get_map
-from modules.uncertainty import run_simulation
+from modules.report import build, to_markdown
 
 st.set_page_config(page_title="SeaTrace", page_icon="🌊", layout="wide")
 
-st.title("🌊 SeaTrace")
-st.caption(
-    "A transparent, literature-informed prototype estimating carbon in "
-    "seaweed aquaculture. Not a certified MRV system - see assumptions and "
-    "limitations below."
-)
 
-blocking = list_blocking()
-if blocking:
-    st.warning(
-        f"**{len(blocking)} coefficients are still unresolved:** "
-        f"{', '.join(blocking)}. Results below use documented placeholders "
-        "for these - see config/coefficients.py and the team's Notion "
-        "Blockers database."
-    )
+@st.cache_data
+def get_report(n, seed):
+    return build(n, seed)
 
-st.markdown("---")
 
-col1, col2 = st.columns([1, 1])
+st.title("SeaTrace")
+st.caption("How much carbon did the Tower Bay kelp trial lock away, and where did it go? "
+           "A literature-based estimate with the working shown. Not a certified MRV statement.")
 
-with col1:
-    st.subheader("Run the pipeline")
-    run_clicked = st.button("Run", type="primary")
+with st.sidebar:
+    n = st.select_slider("Monte Carlo runs", [2000, 5000, 10000], value=5000)
+    seed = st.number_input("Random seed", value=41, step=1)
 
-    if run_clicked:
-        with st.spinner("Estimating biomass..."):
-            biomass_result = get_biomass()
-        st.success(
-            f"Wet biomass estimate: {biomass_result['wet_biomass_tonnes']} "
-            f"tonnes ({biomass_result['method']})"
-        )
-        st.caption(biomass_result["notes"])
+r = get_report(n, int(seed))
+h = r["headline"]
 
-        with st.spinner("Converting biomass to carbon..."):
-            carbon_result = biomass_to_carbon(biomass_result["wet_biomass_tonnes"])
-        st.metric(
-            "Estimated durable carbon (tonnes)",
-            f"{carbon_result['durable_carbon_tonnes']:.2f}",
-        )
-        st.caption(f"Total carbon in dry biomass: {carbon_result['total_carbon_tonnes']:.2f} t")
-        with st.expander("Assumptions used"):
-            st.json(carbon_result["assumptions"])
+c1, c2, c3 = st.columns(3)
+c1.metric("CO2 stored long term, median", f"{h['durable_co2_median_t']*1000:.0f} kg")
+c2.metric("90% range", f"{h['durable_co2_p5_t']*1000:.0f} - {h['durable_co2_p95_t']*1000:.0f} kg")
+c3.metric("Trial", f"{r['farm']['line_m']:.0f} m of line, {r['farm']['season']}")
+st.info("In plain terms: a research-sized trial stores a few tens of kilograms of CO2. Most of the carbon the kelp "
+        "absorbed left in the harvest, and most of what broke off rotted and was released again. "
+        "Not a certified carbon removal claim.")
 
-        with st.spinner("Running uncertainty simulation (200+ runs)..."):
-            uncertainty_result = run_simulation(
-                n_iterations=200,
-                wet_biomass_tonnes=biomass_result["wet_biomass_tonnes"],
-            )
-        st.write("**Durable carbon range (Monte Carlo, n=200):**")
-        u1, u2, u3 = st.columns(3)
-        u1.metric("p5", f"{uncertainty_result['p5']:.2f} t")
-        u2.metric("median", f"{uncertainty_result['median']:.2f} t")
-        u3.metric("p95", f"{uncertainty_result['p95']:.2f} t")
-    else:
-        st.info("Click **Run** to estimate biomass, carbon, and uncertainty.")
+tabs = st.tabs(["Map", "Where carbon goes", "Uncertainty", "Sensitivity", "Validation", "Coefficients", "Report"])
 
-with col2:
-    st.subheader("Study site")
-    farm_map = get_map()
-    st_folium(farm_map, width=None, height=450)
+with tabs[0]:
+    st_folium(get_map(), width=None, height=520)
+    d = r["dispersion"]
+    st.caption(f"Water leaves the channel in about {d['flushing_days']:.0f} days, {d['north_share']:.0%} to the north. "
+               f"{d['intact_at_exit']:.0%} of detritus is still intact on leaving (range "
+               f"{d['intact_at_exit_range'][0]:.0%} to {d['intact_at_exit_range'][1]:.0%}).")
 
-st.markdown("---")
-with st.expander("Coefficients used (config/coefficients.py)"):
-    for cid, entry in sorted(COEFFICIENTS.items()):
-        st.markdown(f"**{cid} — {entry['parameter']}** ({entry['owner']}, {entry['status']})")
-        st.caption(entry["plain_english"])
-        st.write(f"Value: `{entry['value']}` {entry['unit']} | Range: {entry['range']}")
-        st.caption(f"Source: {entry['source']}")
-        st.caption(entry["how_solid"])
-        st.markdown("&nbsp;")
+with tabs[1]:
+    p = r["point_estimate"]
+    st.bar_chart(pd.DataFrame({"kg C": [1000 * p["harvested_c_t"], 1000 * p["released_t"], 1000 * p["deep_t"], 1000 * p["buried_t"]]},
+                              index=["Harvested", "Released", "Deep water", "Buried"]))
+    st.subheader("Through the season")
+    st.dataframe(pd.DataFrame(r["season"]), hide_index=True)
+
+with tabs[2]:
+    st.dataframe(pd.DataFrame(r["stages"])[["label", "p5", "median", "p95", "unit"]], hide_index=True)
+
+with tabs[3]:
+    st.dataframe(pd.DataFrame(r["scenarios"])[["name", "durable_fraction", "durable_co2_t", "change_vs_central", "why"]], hide_index=True)
+    st.dataframe(pd.DataFrame(r["sensitivity"]["rows"])[["label", "co2_at_low", "co2_at_high", "swing"]], hide_index=True)
+
+with tabs[4]:
+    for c in r["validation"]:
+        st.markdown(f"**{c['check']}** ({c['verdict']}): {c['explanation']}  \n_Source: {c['source']}_")
+
+with tabs[5]:
+    for cid, c in COEFFICIENTS.items():
+        flag = " · transferred" if c["transferred"] else ""
+        with st.expander(f"{cid} {c['parameter']} ({c['type']}{flag})"):
+            st.write(c["plain_english"])
+            st.write(f"Value: {c['value']} {c['unit']} | Range: {c['range']}")
+            st.caption(f"Source: {c['source']}")
+            st.caption(c["how_solid"])
+
+with tabs[6]:
+    md = to_markdown(r)
+    st.download_button("Download report (Markdown)", md, "seatrace_report.md")
+    st.download_button("Download data (JSON)", json.dumps(r, default=str, indent=2), "seatrace_report.json")
+    st.markdown(md)

@@ -1,0 +1,616 @@
+<title>SeaTrace Tower Bay</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Source+Serif+4:ital,opsz,wght@1,8..60,400&display=swap">
+<style>
+/* Layout: a nautical-chart reading of a carbon report. Water-blue ground, chart-buff land,
+   magenta for notices, one tab visible at a time under a sticky chart-style nav. */
+:root{
+  --water:#e3eff3; --surface:#f6fafb; --land:#ead9a6; --land-edge:#b9a46a;
+  --ink:#122d37; --muted:#56707a; --rule:#c4d7dd;
+  --accent:#a3266b; --accent-soft:#f6e3ee;
+  --deep:#1d4f8f; --buried:#86601c; --released:#98a7ad; --kelp:#5f7a2c;
+  --good:#2d7a4b; --warn:#a86a10; --bad:#b03434;
+  --f-display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --f-water:"Source Serif 4",Georgia,serif;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --water:#0c1c23; --surface:#12262e; --land:#2e2c20; --land-edge:#58533a;
+  --ink:#e2eef1; --muted:#8ea5ad; --rule:#23404a;
+  --accent:#ea72ad; --accent-soft:#3a1a2b;
+  --deep:#73a6ea; --buried:#d0a75a; --released:#5e7178; --kelp:#9fbb5c;
+  --good:#5cc187; --warn:#e0a548; --bad:#ec7a7a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --water:#0c1c23; --surface:#12262e; --land:#2e2c20; --land-edge:#58533a;
+  --ink:#e2eef1; --muted:#8ea5ad; --rule:#23404a;
+  --accent:#ea72ad; --accent-soft:#3a1a2b;
+  --deep:#73a6ea; --buried:#d0a75a; --released:#5e7178; --kelp:#9fbb5c;
+  --good:#5cc187; --warn:#e0a548; --bad:#ec7a7a; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--water);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:980px;margin:0 auto;padding-inline:16px;padding-block:0 48px}
+h1,h2,h3{font-family:var(--f-display);font-weight:600;letter-spacing:.01em;text-wrap:balance;margin:0;line-height:1.1}
+h2{font-size:1.6rem}
+h3{font-size:1.15rem;letter-spacing:.02em}
+p{margin:0}
+.muted{color:var(--muted)}
+.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.eyebrow{font-family:var(--f-display);font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.stack{display:flex;flex-direction:column;gap:14px}
+.card{background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);padding:16px;min-width:0}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr));gap:14px}
+
+/* header */
+header.top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-block:20px 12px}
+.brand{display:flex;align-items:baseline;gap:10px}
+.brand h1{font-size:2.1rem;font-weight:700;letter-spacing:.02em}
+.brand .tag{font-family:var(--f-display);font-size:.95rem;color:var(--accent);letter-spacing:.08em;text-transform:uppercase;font-weight:600}
+.site{font-size:.85rem;color:var(--muted)}
+@media (min-width:720px){.site{text-align:right}}
+
+/* nav */
+nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--water);border-bottom:2px solid var(--ink);margin-bottom:18px;overflow-x:auto;scrollbar-width:none}
+nav.tabs::-webkit-scrollbar{display:none}
+nav.tabs .row{display:flex;gap:2px;min-width:max-content}
+nav.tabs button{font-family:var(--f-display);font-size:1rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;background:none;border:0;color:var(--muted);padding:10px 12px 8px;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px}
+nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+nav.tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+
+/* hero */
+.hero{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:20px;align-items:end}
+@media (max-width:720px){.hero{grid-template-columns:1fr}}
+.big{font-family:var(--f-display);font-weight:700;font-size:clamp(3.6rem,13vw,6.2rem);line-height:.9;letter-spacing:-.01em}
+.big small{font-size:.38em;font-weight:600;margin-left:6px;letter-spacing:.02em}
+.lede{font-size:1.05rem;max-width:58ch}
+.rangebar{position:relative;height:46px;margin-top:6px}
+.rangebar .track{position:absolute;left:0;right:0;top:20px;height:4px;background:var(--rule);border-radius:2px}
+.rangebar .span{position:absolute;top:16px;height:12px;background:var(--deep);opacity:.25;border-radius:6px}
+.rangebar .tick{position:absolute;top:10px;width:2px;height:24px;background:var(--deep)}
+.rangebar .lab{position:absolute;top:34px;font-size:.75rem;transform:translateX(-50%);white-space:nowrap;color:var(--muted)}
+.rangebar .pt{position:absolute;top:14px;width:12px;height:12px;border:2px solid var(--accent);background:var(--surface);border-radius:50%;transform:translateX(-50%)}
+
+/* flow bar */
+.flow{display:flex;height:34px;border-radius:6px;overflow:hidden;border:1px solid var(--rule)}
+.flow div{height:100%}
+.legend{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:.85rem;margin-top:10px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:12px;height:12px;border-radius:3px;display:inline-block;flex:none}
+
+/* sliders */
+.ctl{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center}
+.ctl label{font-size:.9rem}
+.ctl output{font-family:var(--f-mono);font-size:.85rem;color:var(--accent)}
+.ctl input[type=range]{grid-column:1/-1;width:100%;accent-color:var(--accent)}
+.ctl .hint{grid-column:1/-1;font-size:.75rem;color:var(--muted)}
+button.btn{font-family:var(--f-display);font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:.95rem;border:1.5px solid var(--ink);background:var(--ink);color:var(--surface);padding:8px 14px;border-radius:6px;cursor:pointer}
+button.btn.ghost{background:transparent;color:var(--ink)}
+button.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+select{font:inherit;padding:6px 8px;border-radius:6px;border:1px solid var(--rule);background:var(--surface);color:var(--ink)}
+
+/* tables */
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.88rem}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-family:var(--f-display);font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:.78rem;color:var(--muted)}
+td.r,th.r{text-align:right}
+
+/* chips */
+.chip{display:inline-block;font-family:var(--f-display);font-weight:600;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
+.chip.good{color:var(--good)} .chip.warn{color:var(--warn)} .chip.bad{color:var(--bad)} .chip.info{color:var(--deep)} .chip.acc{color:var(--accent)}
+
+/* map */
+.mapbox{position:relative;border:1px solid var(--rule);border-radius:var(--r);overflow:hidden;background:var(--water)}
+.mapbox svg{display:block;width:100%;height:auto}
+.landfill{fill:var(--land);stroke:var(--land-edge);stroke-width:.8}
+.wlabel{font-family:var(--f-water);font-style:italic;fill:var(--deep);font-size:13px}
+.llabel{font-family:var(--f-display);font-weight:600;letter-spacing:.12em;text-transform:uppercase;fill:var(--muted);font-size:12px}
+.notice{border-left:3px solid var(--accent);background:var(--accent-soft);padding:10px 12px;border-radius:0 6px 6px 0;font-size:.88rem}
+
+/* coefficient list */
+.coef{display:grid;grid-template-columns:62px minmax(0,1fr);gap:4px 12px;padding:12px 0;border-bottom:1px solid var(--rule)}
+.coef .id{font-family:var(--f-mono);font-weight:500;color:var(--accent)}
+.coef .meta{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0}
+.coef details{font-size:.85rem;color:var(--muted)}
+.coef summary{cursor:pointer;color:var(--ink)}
+pre.report{white-space:pre-wrap;word-break:break-word;font-family:var(--f-mono);font-size:.78rem;background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);padding:14px;max-height:70vh;overflow:auto}
+.foot{margin-top:28px;font-size:.8rem;color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){.flow div,.rangebar .span,.rangebar .tick,.rangebar .pt{transition:all .25s ease}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><h1>SeaTrace</h1><span class="tag">Kelp carbon report</span></div>
+    <div class="site">Tower Bay research site · D'Entrecasteaux Channel, Tasmania<br>
+      <span class="num">43°23.4′S 147°02.2′E</span> · 7.9 ha permit · giant kelp · May–Nov 2024</div>
+  </header>
+
+  <nav class="tabs" aria-label="Sections"><div class="row" role="tablist" id="tabs"></div></nav>
+
+  <!-- SUMMARY -->
+  <section data-tab="summary" class="stack">
+    <div class="hero">
+      <div class="stack" style="gap:6px">
+        <span class="eyebrow">CO₂ locked away long term, one trial season</span>
+        <div class="big num" id="h-median">–<small>kg CO₂</small></div>
+        <div class="rangebar" id="h-range" aria-label="Likely range"></div>
+      </div>
+      <div class="stack" style="gap:10px">
+        <p class="lede" id="h-lede"></p>
+        <p class="muted" style="font-size:.85rem">A literature-based estimate with every assumption shown. Not a certified carbon removal claim: no approved method for seaweed farms exists yet.</p>
+      </div>
+    </div>
+
+    <div class="notice" id="scale-note"></div>
+    <div class="card stack">
+      <div>
+        <h3>Where the kelp's carbon went</h3>
+        <p class="muted" style="font-size:.88rem" id="flow-caption"></p>
+      </div>
+      <div class="flow" id="flow"></div>
+      <div class="legend" id="flow-legend"></div>
+    </div>
+
+    <div class="grid2">
+      <div class="card stack">
+        <div><h3>Try different assumptions</h3>
+          <p class="muted" style="font-size:.85rem">Move a slider to see how one number changes the result. The range above stays fixed: it already covers all of these.</p></div>
+        <div class="stack" id="whatif"></div>
+        <div><button class="btn ghost" id="reset">Reset to central values</button></div>
+      </div>
+      <div class="card stack">
+        <h3>With these assumptions</h3>
+        <table><tbody id="whatif-out"></tbody></table>
+        <div class="notice" id="pe-note"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAP -->
+  <section data-tab="map" class="stack" hidden>
+    <div><h2>Where the drifting kelp goes</h2>
+      <p class="muted">Pieces that break off ride the channel's outflow. They rot as they go, so line weight shows how much is still intact.</p></div>
+    <div class="grid2">
+      <div class="mapbox" id="map"></div>
+      <div class="stack">
+        <div class="card stack">
+          <div class="ctl"><label for="m-k">Decay rate</label><output id="m-k-o"></output>
+            <input type="range" id="m-k" min="0" max="1000" step="1">
+            <span class="hint">N-02, per day. Published rates disagree about 10×, from cold northern kelps to warm WA water.</span></div>
+          <div class="ctl"><label for="m-t">Days water stays in the channel</label><output id="m-t-o"></output>
+            <input type="range" id="m-t" min="20" max="26" step="0.5">
+            <span class="hint">N-19, CSIRO channel model: 20 days in winter, 26 overall.</span></div>
+          <div class="ctl"><label for="m-n">Share of outflow going north</label><output id="m-n-o"></output>
+            <input type="range" id="m-n" min="0.6" max="0.9" step="0.01">
+            <span class="hint">N-20. CSIRO: most water leaves north to Storm Bay. The exact split is assumed.</span></div>
+        </div>
+        <div class="card stack" id="map-stats"></div>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="card stack">
+        <h3>The farm, close up</h3>
+        <div id="farm-inset"></div>
+        <p class="muted" style="font-size:.85rem">Permit boundary from MAST Notice to Mariners M276-26(T), drawn to scale over 10 m Sentinel-2 pixels. The kelp itself took up only a small part: the sister site used three 18 m rings and a 60 m array, sketched here to scale (exact position unknown). It also grew 5–10 m down, so satellite shows when it was there, not how much.</p>
+      </div>
+      <div class="card stack">
+        <h3>Satellite timing evidence</h3>
+        <div id="scenes"></div>
+        <p class="muted" style="font-size:.85rem">Clear Sentinel-2 L2A scenes over the farm polygon, from 161 acquisitions (N-12).</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CARBON -->
+  <section data-tab="carbon" class="stack" hidden>
+    <div><h2>From kelp to stored carbon</h2>
+      <p class="muted">Each step multiplies by one published number. Central values shown. Harvested kelp is sold, so its carbon doesn't count as stored.</p></div>
+    <div class="card tw"><table id="chain"></table></div>
+    <div class="grid2">
+      <div class="card stack"><h3>Where the fixed carbon went</h3><div id="tree"></div></div>
+      <div class="card stack"><h3>Through the season</h3><div id="season"></div>
+        <p class="muted" style="font-size:.8rem">Monthly split uses an assumed growth curve (N-21). Season totals do not depend on it.</p></div>
+    </div>
+  </section>
+
+  <!-- RANGE -->
+  <section data-tab="range" class="stack" hidden>
+    <div><h2>How sure are we?</h2>
+      <p class="muted">The model runs thousands of times, each time drawing every uncertain number from its published range.</p></div>
+    <div class="card stack">
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:end">
+        <label class="stack" style="gap:2px" for="mc-n"><span class="eyebrow">Runs</span>
+          <select id="mc-n"><option>2000</option><option selected>5000</option><option>10000</option><option>20000</option></select></label>
+        <label class="stack" style="gap:2px" for="mc-seed"><span class="eyebrow">Seed</span>
+          <select id="mc-seed"><option>41</option><option>1</option><option>2</option><option>3</option><option>7</option></select></label>
+        <button class="btn" id="mc-run">Run again</button>
+        <button class="btn ghost" id="mc-stab">Check stability</button>
+      </div>
+      <div id="hist"></div>
+      <div id="stab"></div>
+    </div>
+    <div class="card tw"><h3 style="margin-bottom:8px">Uncertainty at every stage</h3><table id="stages"></table></div>
+  </section>
+
+  <!-- DRIVERS -->
+  <section data-tab="drivers" class="stack" hidden>
+    <div><h2>What drives the answer</h2>
+      <p class="muted">Each input moved from its low to its high value, everything else held at central values. Kilograms of CO₂ stored.</p></div>
+    <div class="card"><div id="tornado"></div></div>
+    <div><h2 style="font-size:1.3rem">Other cases</h2>
+      <p class="muted">Whole alternative cases, including a farm that fills the whole permit area.</p></div>
+    <div class="stack" id="scen"></div>
+  </section>
+
+  <!-- CHECKS -->
+  <section data-tab="checks" class="stack" hidden>
+    <div><h2>Checked against published figures</h2>
+      <p class="muted">Nobody has measured where this farm's carbon went, so these test plausibility, not truth.</p></div>
+    <div class="stack" id="checks"></div>
+  </section>
+
+  <!-- SOURCES -->
+  <section data-tab="sources" class="stack" hidden>
+    <div style="display:flex;justify-content:space-between;align-items:end;gap:12px;flex-wrap:wrap">
+      <div><h2>Every number and where it came from</h2>
+        <p class="muted">Mirrors the team's Notion coefficient register.</p></div>
+      <label style="display:flex;gap:6px;align-items:center;font-size:.9rem" for="only-t"><input type="checkbox" id="only-t"> Borrowed from elsewhere only</label>
+    </div>
+    <div class="card" id="coefs" style="padding-block:4px"></div>
+  </section>
+
+  <!-- REPORT -->
+  <section data-tab="report" class="stack" hidden>
+    <div style="display:flex;justify-content:space-between;align-items:end;gap:12px;flex-wrap:wrap">
+      <div><h2>Farm carbon report</h2>
+        <p class="muted">Generated by the Python pipeline (5,000 runs, seed 41): estimate, range, assumptions, sources with verification status, and limitations.</p></div>
+      <button class="btn" id="copy">Copy report</button>
+    </div>
+    <span id="copy-msg" class="muted" style="font-size:.85rem"></span>
+    <pre class="report" id="report" tabindex="0"></pre>
+  </section>
+
+  <p class="foot" id="foot"></p>
+</div>
+
+<script>
+const D = /*__DATA__*/null;
+const C = D.coef, PID = D.paramIds;
+const $ = s => document.querySelector(s);
+const fmt = (x, d=2) => Number(x).toLocaleString("en-AU", {minimumFractionDigits:d, maximumFractionDigits:d});
+const pct = (x, d=1) => (x*100).toFixed(d) + "%";
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const kg = t => t < 1 ? `${Math.round(t*1000).toLocaleString("en-AU")} kg` : `${fmt(t,2)} t`;
+const sig = x => Number(x.toPrecision(3)).toLocaleString("en-AU", {maximumFractionDigits:4});
+
+/* ---------- model (mirrors modules/carbon.py v2) ---------- */
+const central = () => Object.fromEntries(Object.entries(PID).map(([k, id]) => [k, +C[id].value]));
+const LINE0 = C["N-22"].value;
+let LINE = LINE0;
+function fate(p){
+  const poc = p.poc_loss_fraction, doc = p.doc_release_fraction;
+  const poc_deep = poc * p.poc_deep_fraction, buried = poc * (1 - p.poc_deep_fraction) * p.poc_burial_fraction;
+  const doc_deep = doc * p.doc_deep_fraction, harvested = 1 - poc - doc, deep = poc_deep + doc_deep;
+  return {harvested, poc_lost: poc, doc_released: doc, poc_deep, doc_deep, deep, buried, released: poc + doc - deep - buried, durable: deep + buried};
+}
+function model(p, wet, line){
+  wet = wet ?? (line ?? LINE0) * p.yield_kg_per_m / 1000;
+  const dry = wet * p.dry_matter_fraction, ch = dry * p.carbon_content_fraction, f = fate(p), cf = ch / f.harvested;
+  return {wet_t:wet, dry_t:dry, harvested_c_t:ch, carbon_t:cf, exported_t:cf*(f.poc_lost+f.doc_released),
+    buried_t:cf*f.buried, deep_t:cf*f.deep, released_t:cf*f.released, durable_t:cf*f.durable, durable_co2_t:cf*f.durable*D.co2PerC, f};
+}
+function season(finalWet){
+  const r = C["N-21"].value, months = C["N-08"].months, n = months.length, mid = (n-1)/2;
+  const raw = t => 1/(1+Math.exp(-r*(t-mid))), base = raw(-1), sc = finalWet/(raw(n-1)-base);
+  let prev = 0;
+  return months.map((m,i) => { const s = (raw(i)-base)*sc, g = s-prev; prev = s; return {month:m, standing:s, growth:g}; });
+}
+
+/* ---------- Monte Carlo (mirrors modules/uncertainty.py) ---------- */
+function rng(seed){ let a = seed >>> 0; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function draw(u, c){
+  const lo = c.low, hi = c.high, m = +c.value;
+  if (c.dist === "triangular"){ const F = (m-lo)/(hi-lo); return u < F ? lo + Math.sqrt(u*(hi-lo)*(m-lo)) : hi - Math.sqrt((1-u)*(hi-lo)*(hi-m)); }
+  if (c.dist === "loguniform") return Math.exp(Math.log(lo) + u*(Math.log(hi)-Math.log(lo)));
+  return lo + u*(hi-lo);
+}
+const STAGES = [["wet_t","Kelp harvested (wet)","t"],["dry_t","Kelp harvested (dry)","t"],["carbon_t","Carbon fixed by the kelp","t C"],["exported_t","Carbon lost before harvest","t C"],["durable_t","Carbon stored long term","t C"],["durable_co2_t","CO₂ stored long term","t CO₂"]];
+function quantile(sorted, q){ const i = (sorted.length-1)*q, lo = Math.floor(i), hi = Math.ceil(i); return sorted[lo] + (sorted[hi]-sorted[lo])*(i-lo); }
+function monteCarlo(n, seed){
+  const R = rng(seed), out = Object.fromEntries(STAGES.map(s => [s[0], new Float64Array(n)]));
+  for (let i = 0; i < n; i++){
+    const p = {}; for (const [k, id] of Object.entries(PID)) p[k] = draw(R(), C[id]);
+    const r = model(p); for (const s of STAGES) out[s[0]][i] = r[s[0]];
+  }
+  const stages = STAGES.map(([k, label, unit]) => { const a = Float64Array.from(out[k]).sort(); return {k, label, unit, p5:quantile(a,.05), median:quantile(a,.5), p95:quantile(a,.95)}; });
+  return {n, seed, stages, samples: out.durable_co2_t, co2: stages[stages.length-1]};
+}
+
+/* ---------- state ---------- */
+let P = central(), MC = monteCarlo(5000, 41);
+const TABS = [["summary","Summary"],["map","Map"],["carbon","Carbon"],["range","Range"],["drivers","Drivers"],["checks","Checks"],["sources","Sources"],["report","Report"]];
+
+/* ---------- tabs ---------- */
+function showTab(id){
+  document.querySelectorAll("section[data-tab]").forEach(s => s.hidden = s.dataset.tab !== id);
+  document.querySelectorAll("#tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.t === id));
+  try { localStorage.setItem("seatrace-tab", id); } catch(e) {}
+}
+$("#tabs").innerHTML = TABS.map(([id, l]) => `<button role="tab" data-t="${id}">${l}</button>`).join("");
+$("#tabs").addEventListener("click", e => { const b = e.target.closest("button"); if (b){ showTab(b.dataset.t); window.scrollTo({top:0}); } });
+
+/* ---------- summary ---------- */
+function renderHero(){
+  const c = MC.co2, pt = model(P, undefined, LINE).durable_co2_t;
+  $("#h-median").innerHTML = `${Math.round(c.median*1000)}<small>kg CO₂</small>`;
+  const hi = Math.max(c.p95, pt) * 1.15, X = v => Math.min(100, v/hi*100);
+  $("#h-range").innerHTML = `<div class="track"></div>
+    <div class="span" style="left:${X(c.p5)}%;width:${X(c.p95)-X(c.p5)}%"></div>
+    <div class="tick" style="left:${X(c.median)}%"></div>
+    <div class="pt" style="left:${X(pt)}%" title="With the assumptions below"></div>
+    <div class="lab" style="left:${X(c.p5)}%">${kg(c.p5)}</div>
+    <div class="lab" style="left:${X(c.p95)}%">${kg(c.p95)}</div>`;
+  const r = model(central());
+  $("#h-lede").innerHTML = `Over one ~6-month trial the kelp absorbed about <b>${kg(r.carbon_t*D.co2PerC)} of CO₂</b>. About two-thirds left in the harvest, and most of what broke off rotted and was released. Between <b>${kg(c.p5)} and ${kg(c.p95)}</b> stayed out of the atmosphere long term, most likely around <b>${kg(c.median)}</b>.`;
+  const fs = D.scenarios.find(s => s.wet), fr = fs ? model({...central(), ...fs.overrides}, fs.wet) : null;
+  $("#scale-note").innerHTML = `This is a research-sized trial: about ${LINE0} m of rope, not 7.9 ha of kelp. ${fr ? `If kelp filled the whole permit area at wild-forest density, it would store about <b>${kg(fr.durable_co2_t)}</b> of CO₂ a season (see Drivers).` : ""} Figures are before any allowance for the sea re-absorbing CO₂ from the air, which would lower them.`;
+}
+const FLOW = [["harvested_c_t","Harvested and taken away","--kelp"],["released_t","Broke off and rotted","--released"],["deep_t","Reached deep water","--deep"],["buried_t","Buried in the seabed","--buried"]];
+function renderFlow(){
+  const r = model(P, undefined, LINE);
+  $("#flow").innerHTML = FLOW.map(([k, l, v]) => `<div style="width:${r[k]/r.carbon_t*100}%;background:var(${v})" title="${l}: ${kg(r[k])} C"></div>`).join("");
+  $("#flow-legend").innerHTML = FLOW.map(([k, l, v]) => `<span><i class="sw" style="background:var(${v})"></i>${l} <b class="num">${pct(r[k]/r.carbon_t, r[k]/r.carbon_t < .1 ? 1 : 0)}</b></span>`).join("");
+  $("#flow-caption").textContent = `${kg(r.carbon_t)} of carbon fixed. Only deep water and seabed count as stored: ${pct(r.durable_t/r.carbon_t)} of the total.`;
+}
+const WHATIF = [
+  ["line_m","Metres of kelp line","m","Unknown for Tower Bay; the sister site had 360 m. A commercial farm might have tens of kilometres.",0, 60, 2000, 10],
+  ["yield_kg_per_m","Kelp grown per metre of line","kg/m","Sister site 2024: 10 kg/m. Other Tasmanian farms 2020: 1.2 kg/m.",1],
+  ["dry_matter_fraction","Solid matter in wet kelp","fraction","Most sources say about 0.10; one Tasmanian record says 0.055.",3],
+  ["poc_loss_fraction","Kelp lost as pieces before harvest","fraction","Norwegian farms: 8–13% with a normal harvest, 49% when harvest was late.",2],
+  ["doc_release_fraction","Carbon leaking out dissolved","fraction","12–29% measured on Norwegian farms; 23% for seaweed worldwide.",2],
+  ["doc_deep_fraction","Dissolved carbon reaching deep water","fraction","Published upper boundary 0.33; central 0.24 is unsourced.",2],
+];
+function renderWhatIf(){
+  $("#whatif").innerHTML = WHATIF.map(([k, l, u, h, d, mn, mx, st]) => {
+    const isLine = k === "line_m", c = isLine ? null : C[PID[k]];
+    const lo = isLine ? mn : c.low, hi = isLine ? mx : c.high, step = isLine ? st : (hi-lo)/100, v = isLine ? LINE : P[k];
+    return `<div class="ctl"><label for="w-${k}">${l} <span class="muted num" style="font-size:.75rem">${isLine ? "N-22" : PID[k]}</span></label><output id="w-${k}-o" class="num">${(+v).toFixed(d)}</output>
+      <input type="range" id="w-${k}" min="${lo}" max="${hi}" step="${step}" value="${v}"><span class="hint">${h}</span></div>`; }).join("");
+  WHATIF.forEach(([k,,,,d]) => $("#w-"+k).addEventListener("input", e => { const v = +e.target.value; if (k === "line_m") LINE = v; else P[k] = v; $("#w-"+k+"-o").textContent = v.toFixed(d); updateWhatIf(); }));
+  updateWhatIf();
+}
+function updateWhatIf(){
+  const r = model(P, undefined, LINE);
+  $("#whatif-out").innerHTML = [["Kelp harvested", fmt(r.wet_t, 2) + " t wet"], ["Carbon fixed", kg(r.carbon_t) + " C"], ["Lost before harvest", kg(r.exported_t) + " C"], ["Stored long term", kg(r.durable_t) + " C"], ["As CO₂", kg(r.durable_co2_t) + " CO₂"]]
+    .map(([l, v], i, a) => `<tr><td>${l}</td><td class="r num" style="${i===a.length-1?'font-weight:600;color:var(--accent)':''}">${v}</td></tr>`).join("");
+  const isCentral = LINE === LINE0 && Object.keys(P).every(k => Math.abs(P[k] - central()[k]) < 1e-9);
+  $("#pe-note").innerHTML = isCentral
+    ? `Central values give <b class="num">${kg(r.durable_co2_t)} CO₂</b>. The median above is a little lower because most inputs are skewed toward their low ends.`
+    : `Your assumptions give <b class="num">${kg(r.durable_co2_t)} CO₂</b> (pink dot on the range above).`;
+  renderFlow(); renderHero();
+}
+$("#reset").addEventListener("click", () => { P = central(); LINE = LINE0; renderWhatIf(); });
+
+/* ---------- map ---------- */
+/* ---------- map ---------- */
+const G = D.geo;
+const kFromSlider = v => Math.exp(Math.log(C["N-02"].low) + v/1000*(Math.log(C["N-02"].high)-Math.log(C["N-02"].low)));
+const sliderFromK = k => Math.round((Math.log(k)-Math.log(C["N-02"].low))/(Math.log(C["N-02"].high)-Math.log(C["N-02"].low))*1000);
+let M = {k: C["N-02"].value, T: C["N-19"].value, n: C["N-20"].value};
+function renderMap(){
+  const routes = G.routes.map((r, i) => {
+    const share = i === 0 ? M.n : 1 - M.n, total = r.pts[r.pts.length-1][2];
+    let segs = "";
+    for (let j = 1; j < r.pts.length; j++){
+      const a = r.pts[j-1], b = r.pts[j], intact = Math.exp(-M.k * (a[2]/total) * M.T);
+      segs += `<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="var(--accent)" stroke-linecap="butt" stroke-width="${(2 + 14*share*intact).toFixed(2)}" stroke-opacity="${(.2 + .75*intact).toFixed(2)}"/>`;
+    }
+    const e = r.pts[r.pts.length-1];
+    return segs + `<circle cx="${e[0]}" cy="${e[1]}" r="5" fill="var(--surface)" stroke="var(--accent)" stroke-width="2"/>`;
+  }).join("");
+  const [fx, fy] = G.farmCentroid;
+  const labels = G.labels.map(l => `<text x="${l.x}" y="${l.y}" class="${l.water?'wlabel':'llabel'}" text-anchor="middle">${esc(l.name)}</text>`).join("");
+  const kmScale = 10 / G.kmPerUnit;
+  $("#map").innerHTML = `<svg viewBox="0 0 ${G.w} ${G.h}" role="img" aria-label="Map of the D'Entrecasteaux Channel with the Tower Bay farm and modelled detritus routes">
+    <rect width="${G.w}" height="${G.h}" fill="var(--water)"/>
+    <path d="${G.land}" class="landfill" fill-rule="evenodd"/>
+    ${routes}
+    <circle cx="${fx}" cy="${fy}" r="${0.8/G.kmPerUnit}" fill="var(--buried)" fill-opacity=".25" stroke="var(--buried)" stroke-dasharray="3 3"/>
+    <rect x="${fx-5}" y="${fy-5}" width="10" height="10" fill="var(--kelp)" stroke="var(--ink)" stroke-width="1.2"/>
+    <text x="${fx-10}" y="${fy+4}" text-anchor="end" class="llabel" style="fill:var(--ink)">Farm</text>
+    ${labels}
+    <g transform="translate(16 ${G.h-22})"><line x1="0" y1="0" x2="${kmScale}" y2="0" stroke="var(--ink)" stroke-width="2"/><line x1="0" y1="-5" x2="0" y2="5" stroke="var(--ink)"/><line x1="${kmScale}" y1="-5" x2="${kmScale}" y2="5" stroke="var(--ink)"/><text x="${kmScale/2}" y="-8" text-anchor="middle" class="llabel" style="fill:var(--ink)">10 km</text></g>
+    <g transform="translate(${G.w-26} 34)"><path d="M0 -18 L6 4 L0 0 L-6 4 Z" fill="var(--ink)"/><text y="18" text-anchor="middle" class="llabel" style="fill:var(--ink)">N</text></g>
+  </svg>`;
+  const exit = Math.exp(-M.k*M.T), lo = Math.exp(-C["N-02"].high*M.T), hi = Math.exp(-C["N-02"].low*M.T);
+  $("#m-k-o").textContent = M.k.toFixed(3) + " /day";
+  $("#m-t-o").textContent = M.T + " days";
+  $("#m-n-o").textContent = pct(M.n,0);
+  $("#map-stats").innerHTML = `
+    <div><span class="eyebrow">Still intact when it leaves the channel</span><div class="big num" style="font-size:2.6rem">${pct(exit,0)}</div>
+    <p class="muted" style="font-size:.85rem">Across all published decay rates: ${pct(lo,0)} to ${pct(hi,0)}.</p></div>
+    <div class="legend" style="flex-direction:column;gap:6px;margin:0">
+      <span><i class="sw" style="background:var(--accent)"></i>Drifting detritus; thicker and darker means more still intact</span>
+      <span><i class="sw" style="background:var(--buried);opacity:.5"></i>Settling zone on sandy seabed, ~15 m (where buried carbon ends up)</span>
+      <span><i class="sw" style="background:var(--land);border:1px solid var(--land-edge)"></i>Land (1 km land mask; context, not for navigation)</span></div>
+    <p class="muted" style="font-size:.82rem">Leaving the channel only reaches Storm Bay or the southern entrance, not yet the deep ocean. This footprint explains the route; it doesn't change the carbon number.</p>`;
+}
+function initMap(){
+  $("#m-k").value = sliderFromK(M.k); $("#m-t").value = M.T; $("#m-n").value = M.n;
+  $("#m-k").addEventListener("input", e => { M.k = kFromSlider(+e.target.value); renderMap(); });
+  $("#m-t").addEventListener("input", e => { M.T = +e.target.value; renderMap(); });
+  $("#m-n").addEventListener("input", e => { M.n = +e.target.value; renderMap(); });
+  renderMap();
+  // farm inset: polygon in metres with a 10 m grid
+  const pts = C["N-09"].value, lat0 = pts.reduce((s,p)=>s+p[0],0)/4, lon0 = pts.reduce((s,p)=>s+p[1],0)/4;
+  const m = pts.map(([la, lo]) => [(lo-lon0)*111320*Math.cos(lat0*Math.PI/180), -(la-lat0)*110574]);
+  const xs = m.map(p=>p[0]), ys = m.map(p=>p[1]), pad = 30;
+  const x0 = Math.min(...xs)-pad, y0 = Math.min(...ys)-pad, W = Math.max(...xs)-x0+pad, H = Math.max(...ys)-y0+pad;
+  let grid = ""; for (let x = Math.ceil(x0/10)*10; x < x0+W; x += 10) grid += `M${x} ${y0}V${y0+H}`; for (let y = Math.ceil(y0/10)*10; y < y0+H; y += 10) grid += `M${x0} ${y}H${x0+W}`;
+  const side = (a,b) => Math.hypot(m[a][0]-m[b][0], m[a][1]-m[b][1]);
+  const mid = (a,b) => [(m[a][0]+m[b][0])/2, (m[a][1]+m[b][1])/2];
+  const [l1x,l1y] = mid(0,1), [l2x,l2y] = mid(1,2);
+  $("#farm-inset").innerHTML = `<div class="tw"><svg viewBox="${x0} ${y0} ${W} ${H}" style="width:100%;height:auto;display:block;min-width:280px" role="img" aria-label="Farm boundary drawn to scale over a 10 metre pixel grid">
+    <rect x="${x0}" y="${y0}" width="${W}" height="${H}" fill="var(--water)"/>
+    <path d="${grid}" stroke="var(--rule)" stroke-width=".6"/>
+    <polygon points="${m.map(p=>p.join(",")).join(" ")}" fill="var(--kelp)" fill-opacity=".35" stroke="var(--kelp)" stroke-width="2"/>
+    ${m.map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="4" fill="var(--accent)"/>`).join("")}
+    <g transform="translate(-60 -5)" aria-label="Illustrative trial layout">
+      ${[0,1,2].map(i=>`<circle cx="${i*24}" cy="0" r="9" fill="none" stroke="var(--ink)" stroke-width="1.6"/>`).join("")}
+      ${[0,1,2].map(i=>`<line x1="66" x2="126" y1="${-5+i*5}" y2="${-5+i*5}" stroke="var(--ink)" stroke-width="1.6"/>`).join("")}
+      <text x="33" y="26" text-anchor="middle" class="llabel" style="fill:var(--ink);font-size:11px">Trial kelp (illustrative)</text>
+    </g>
+    <text x="${l1x}" y="${l1y-10}" text-anchor="middle" class="llabel" style="fill:var(--ink);font-size:13px">${Math.round(side(0,1))} m</text>
+    <text x="${l2x+12}" y="${l2y+4}" class="llabel" style="fill:var(--ink);font-size:13px">${Math.round(side(1,2))} m</text>
+  </svg></div>`;
+  const sc = C["N-12"].scenes, mx = Math.max(...sc.map(s=>s.clear));
+  $("#scenes").innerHTML = sc.map(s => `<div style="display:grid;grid-template-columns:minmax(0,9rem) 1fr auto;gap:10px;align-items:center;margin-bottom:8px">
+    <span style="font-size:.88rem">${esc(s.window)}</span><div style="height:14px;background:var(--rule);border-radius:7px"><div style="height:100%;width:${s.clear/mx*100}%;background:var(--deep);border-radius:7px"></div></div><b class="num">${s.clear}</b></div>`).join("");
+}
+
+
+/* ---------- carbon ---------- */
+function renderCarbon(){
+  const p = central(), r = model(p), f = r.f;
+  const rows = [
+    ["Kelp harvested (wet)", `${LINE0} m × ${p.yield_kg_per_m} kg/m`, "N-22 × N-15", fmt(r.wet_t,2) + " t"],
+    ["Solid matter", "× " + p.dry_matter_fraction, "N-13", fmt(r.dry_t,2) + " t"],
+    ["Carbon in the harvest", "× " + p.carbon_content_fraction, "N-01", kg(r.harvested_c_t) + " C"],
+    ["Carbon fixed in total", "÷ " + fmt(f.harvested,2) + " (share harvested)", "N-23, N-24", kg(r.carbon_t) + " C"],
+    ["Stored long term", "× " + pct(f.durable), "fate tree", kg(r.durable_t) + " C"],
+    ["As CO₂", "× 44/12", "molecular weights", kg(r.durable_co2_t) + " CO₂"]];
+  $("#chain").innerHTML = `<thead><tr><th>Step</th><th>Multiply by</th><th class="r">Result</th></tr></thead><tbody>` +
+    rows.map(([a,b,c,d]) => `<tr><td>${a}<div class="num muted" style="font-size:.75rem">${c}</div></td><td class="num">${b}</td><td class="r num" style="white-space:nowrap">${d}</td></tr>`).join("") + "</tbody>";
+  const node = (x, y, w, label, val, col) => `<g><rect x="${x}" y="${y}" width="${w}" height="44" rx="6" fill="var(--surface)" stroke="var(${col})" stroke-width="1.6"/>
+     <text x="${x+w/2}" y="${y+18}" text-anchor="middle" style="font:600 11.5px var(--f-body);fill:var(--ink)">${label}</text>
+     <text x="${x+w/2}" y="${y+35}" text-anchor="middle" style="font:500 12px var(--f-mono);fill:var(${col})">${val}</text></g>`;
+  const ln = (x1,y1,x2,y2) => `<path d="M${x1} ${y1} C${x1} ${(y1+y2)/2} ${x2} ${(y1+y2)/2} ${x2} ${y2}" fill="none" stroke="var(--rule)" stroke-width="2"/>`;
+  $("#tree").innerHTML = `<div class="tw"><svg viewBox="-2 0 428 262" style="width:100%;height:auto" role="img" aria-label="Where the carbon fixed by the kelp went">
+    ${ln(213,48,64,74)}${ln(213,48,213,74)}${ln(213,48,362,74)}
+    ${ln(213,118,133,150)}${ln(213,118,213,150)}${ln(213,118,293,150)}
+    ${ln(362,118,302,212)}${ln(362,118,384,212)}
+    ${node(133,4,160,"Carbon fixed","100%","--ink")}
+    ${node(4,74,120,"Harvested",pct(f.harvested,0),"--kelp")}
+    ${node(153,74,120,"Lost as pieces",pct(f.poc_lost,0),"--muted")}
+    ${node(302,74,120,"Leaked dissolved",pct(f.doc_released,0),"--muted")}
+    ${node(96,150,74,"Deep sea",pct(f.poc_deep),"--deep")}
+    ${node(176,150,74,"Buried",pct(f.buried),"--buried")}
+    ${node(256,150,74,"Released",pct(f.poc_lost-f.poc_deep-f.buried),"--released")}
+    ${node(262,212,80,"Deep water",pct(f.doc_deep),"--deep")}
+    ${node(346,212,78,"Released",pct(f.doc_released-f.doc_deep),"--released")}
+  </svg></div>
+  <p style="font-size:.9rem">Stored long term: <b class="num">${pct(f.durable)}</b> of the carbon fixed (deep water ${pct(f.deep)}, buried ${pct(f.buried)}). The harvest (${pct(f.harvested,0)}) is sold or used, so its carbon returns to the air within years.</p>`;
+  const s = season(r.wet_t), W = 340, H = 170, bw = 32, mx = Math.max(...s.map(x=>x.standing));
+  const y = v => H - 26 - v/mx*(H-50);
+  let bars = "", grid = "";
+  [0, .5, 1].forEach(t => { const v = mx*t; grid += `<line x1="34" x2="${W}" y1="${y(v)}" y2="${y(v)}" stroke="var(--rule)"/><text x="30" y="${y(v)+4}" text-anchor="end" style="font:11px var(--f-mono);fill:var(--muted)">${fmt(v,1)}</text>`; });
+  s.forEach((m, i) => { const x = 42 + i*42, dco2 = model(p, m.growth).durable_co2_t;
+    bars += `<rect x="${x}" y="${y(m.standing)}" width="${bw}" height="${H-26-y(m.standing)}" fill="var(--kelp)" opacity=".75"><title>${m.month}: ${fmt(m.standing,2)} t standing, ${kg(dco2)} CO₂ stored from that month's growth</title></rect>
+      <text x="${x+bw/2}" y="${H-10}" text-anchor="middle" style="font:600 11px var(--f-display);letter-spacing:.06em;fill:var(--muted)">${m.month.toUpperCase()}</text>
+      <text x="${x+bw/2}" y="${y(m.standing)-5}" text-anchor="middle" style="font:10.5px var(--f-mono);fill:var(--ink)">${Math.round(dco2*1000)}</text>`; });
+  $("#season").innerHTML = `<div class="tw"><svg viewBox="0 0 ${W} ${H}" style="width:100%;min-width:300px;height:auto" role="img" aria-label="Standing kelp by month">${grid}${bars}</svg></div>
+    <p class="muted" style="font-size:.8rem">Bars: standing kelp (t wet). Numbers: kg CO₂ stored from that month's growth.</p>`;
+}
+
+/* ---------- range ---------- */
+function niceStep(top){ const raw = top/5, p = Math.pow(10, Math.floor(Math.log10(raw))), m = raw/p; return (m < 1.5 ? 1 : m < 3 ? 2 : m < 7 ? 5 : 10) * p; }
+function renderRange(){
+  const c = MC.co2, a = Float64Array.from(MC.samples, v => v*1000).sort(), top = quantile(a, .995), bins = 28;
+  const counts = new Array(bins).fill(0); for (const v of a){ const b = Math.min(bins-1, Math.floor(v/top*bins)); if (b >= 0) counts[b]++; }
+  const W = 420, H = 210, L = 10, B = 34, mx = Math.max(...counts), X = v => L + v/top*(W-2*L), bw = (W-2*L)/bins;
+  const bars = counts.map((n, i) => { const x = L + i*bw, v = (i+.5)*top/bins, inside = v >= c.p5*1000 && v <= c.p95*1000;
+    return `<rect x="${x+1}" y="${H-B-(n/mx)*(H-B-40)}" width="${bw-2}" height="${(n/mx)*(H-B-40)}" fill="var(--deep)" opacity="${inside?.85:.3}"/>`; }).join("");
+  const st = niceStep(top), ticks = []; for (let t = 0; t <= top; t += st) ticks.push(t);
+  const axis = ticks.map(t => `<line x1="${X(t)}" x2="${X(t)}" y1="${H-B}" y2="${H-B+5}" stroke="var(--muted)"/><text x="${X(t)}" y="${H-B+18}" text-anchor="middle" style="font:12px var(--f-mono);fill:var(--muted)">${t}</text>`).join("");
+  const mk = (v, l, col, yy) => `<line x1="${X(v*1000)}" x2="${X(v*1000)}" y1="34" y2="${H-B}" stroke="var(${col})" stroke-width="1.5" stroke-dasharray="${col==='--accent'?'':'4 3'}"/><text x="${X(v*1000)}" y="${yy}" text-anchor="middle" style="font:600 12px var(--f-mono);fill:var(${col})">${l} ${Math.round(v*1000)}</text>`;
+  $("#hist").innerHTML = `<div class="tw"><svg viewBox="0 0 ${W} ${H}" style="width:100%;min-width:300px;height:auto" role="img" aria-label="Histogram of CO2 stored across runs">
+    <line x1="${L}" x2="${W-L}" y1="${H-B}" y2="${H-B}" stroke="var(--muted)"/>${bars}${axis}
+    ${mk(c.p5,"p5","--muted",30)}${mk(c.median,"median","--accent",14)}${mk(c.p95,"p95","--muted",30)}
+    <text x="${W-L}" y="${H-2}" text-anchor="end" style="font:12px var(--f-body);fill:var(--muted)">kg CO₂ stored long term</text></svg></div>
+    <p style="font-size:.9rem">${MC.n.toLocaleString()} runs, seed ${MC.seed}. 90% of runs fall between <b class="num">${kg(c.p5)}</b> and <b class="num">${kg(c.p95)}</b> of CO₂. The Python pipeline (5,000 runs, its own random generator) gives median <span class="num">${kg(D.python.mc_median)}</span>, range <span class="num">${kg(D.python.mc_p5)}–${kg(D.python.mc_p95)}</span>. With 200,000 runs both settle at about 13, 37 and 95 kg.</p>`;
+  $("#stages").innerHTML = `<thead><tr><th>Stage</th><th class="r">p5</th><th class="r">Median</th><th class="r">p95</th><th>Unit</th></tr></thead><tbody>` +
+    MC.stages.map(s => `<tr><td>${s.label}</td><td class="r num">${sig(s.p5)}</td><td class="r num"><b>${sig(s.median)}</b></td><td class="r num">${sig(s.p95)}</td><td class="muted">${s.unit}</td></tr>`).join("") + "</tbody>";
+}
+$("#mc-run").addEventListener("click", () => { MC = monteCarlo(+$("#mc-n").value, +$("#mc-seed").value); renderRange(); renderHero(); $("#stab").innerHTML = ""; });
+$("#mc-stab").addEventListener("click", () => {
+  const n = +$("#mc-n").value, runs = [1,2,3,4,5].map(s => monteCarlo(n, s).co2);
+  const cv = arr => { const m = arr.reduce((a,b)=>a+b)/arr.length; return Math.sqrt(arr.reduce((a,b)=>a+(b-m)**2,0)/arr.length)/m; };
+  const cm = cv(runs.map(r=>r.median)), cp = cv(runs.map(r=>r.p95)), ok = cm < .02 && cp < .02;
+  $("#stab").innerHTML = `<p style="font-size:.9rem"><span class="chip ${ok?'good':'warn'}">${ok?'Stable':'Not stable yet'}</span> Five seeds at ${n.toLocaleString()} runs: median varies by <span class="num">${pct(cm)}</span>, p95 by <span class="num">${pct(cp)}</span> (limit 2%).${ok?'':' Try more runs.'}</p>`;
+});
+
+/* ---------- drivers ---------- */
+function renderDrivers(){
+  const base = model(central()).durable_co2_t;
+  const rows = Object.entries(PID).map(([k, id]) => { const c = C[id];
+    const lo = model({...central(), [k]: c.low}).durable_co2_t, hi = model({...central(), [k]: c.high}).durable_co2_t;
+    return {k, id, label: D.labels[k], lo, hi, cl: c.low, ch: c.high, swing: Math.abs(hi-lo)}; }).sort((a,b) => b.swing - a.swing);
+  const mxv = Math.max(...rows.map(r=>Math.max(r.lo,r.hi))), X = v => v/(mxv*1.04)*100;
+  const seg = (v, col) => { const l = Math.min(X(v), X(base)), w = Math.abs(X(v) - X(base)); return `<div style="position:absolute;top:2px;bottom:2px;left:${l}%;width:${Math.max(.4,w)}%;background:var(${col})"></div>`; };
+  $("#tornado").innerHTML = `<div class="stack" style="gap:12px">` + rows.map(r => `<div style="display:grid;gap:3px">
+      <div style="display:flex;justify-content:space-between;gap:10px;font-size:.88rem"><span>${esc(r.label.replace(/ \(N-\d+\)/,""))} <span class="num muted" style="font-size:.75rem">${r.id} · ${r.cl}–${r.ch}</span></span>
+        <span class="num muted" style="white-space:nowrap">${Math.round(Math.min(r.lo,r.hi)*1000)}–${Math.round(Math.max(r.lo,r.hi)*1000)} kg</span></div>
+      <div style="position:relative;height:20px;background:var(--water);border-radius:3px">${seg(r.lo,"--released")}${seg(r.hi,"--deep")}
+        <div style="position:absolute;top:-3px;bottom:-3px;left:${X(base)}%;width:2px;background:var(--ink)"></div></div></div>`).join("") + `</div>
+    <div class="legend"><span><i class="sw" style="background:var(--released)"></i>Input at its low value</span><span><i class="sw" style="background:var(--deep)"></i>Input at its high value</span><span><i class="sw" style="background:var(--ink);width:3px"></i>Central ${kg(base)} CO₂</span></div>
+    <p style="font-size:.9rem;margin-top:8px">How much kelp breaks off before harvest matters most: a late harvest could quadruple what is stored. Next are how much kelp grew per metre and how much carbon leaks out dissolved. The Tower Bay line length (not shown, fixed at ${LINE0} m) scales everything in proportion and is the biggest unknown of all.</p>`;
+  const vals = D.scenarios.map(s => model({...central(), ...s.overrides}, s.wet ?? undefined).durable_co2_t);
+  const mxs = Math.max(...vals.filter((v, i) => !D.scenarios[i].wet));
+  $("#scen").innerHTML = D.scenarios.map((s, i) => { const r = model({...central(), ...s.overrides}, s.wet ?? undefined), ch = r.durable_co2_t/base - 1, off = r.durable_co2_t > mxs*1.01;
+    return `<div class="card" style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 16px;align-items:start">
+      <div class="stack" style="gap:4px"><h3>${esc(s.name)} ${i===0?'<span class="chip acc">used</span>':''}${s.wet?'<span class="chip info">scale-up</span>':''}</h3><p class="muted" style="font-size:.86rem">${esc(s.why)}</p>
+        <div style="height:10px;background:var(--rule);border-radius:5px;margin-top:4px"><div style="height:100%;width:${Math.min(100, r.durable_co2_t/mxs*100)}%;background:var(${off?'--accent':'--deep'});border-radius:5px"></div></div>${off?'<span class="muted" style="font-size:.75rem">Bar off the scale</span>':''}</div>
+      <div style="text-align:right"><div class="num" style="font-size:1.25rem;font-weight:500">${kg(r.durable_co2_t)}</div>
+        <div class="num muted" style="font-size:.8rem">${pct(r.f.durable)} of fixed C</div>${i?`<div class="num" style="font-size:.8rem;color:var(${ch<0?'--bad':'--good'})">${ch>0?'+':''}${Math.round(ch*100)}%</div>`:''}</div></div>`; }).join("");
+}
+
+/* ---------- checks ---------- */
+function renderChecks(){
+  const cls = {match:"good", "lower, as expected":"good", close:"good", disagrees:"bad", lower:"warn", "assumed equal":"warn", transferred:"info"};
+  const show = (v, u) => v == null ? "–" : u === "share" ? pct(v) : `${fmt(v, 2)} ${u}`;
+  $("#checks").innerHTML = D.validation.map(c => `<div class="card stack" style="gap:8px">
+    <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center"><h3>${esc(c.check)}</h3><span class="chip ${cls[c.verdict]||'info'}">${esc(c.verdict)}</span></div>
+    <div style="display:flex;gap:24px;flex-wrap:wrap"><div><span class="eyebrow">SeaTrace</span><div class="num" style="font-size:1.4rem">${show(c.ours, c.unit)}</div></div>
+      <div><span class="eyebrow">Published</span><div class="num" style="font-size:1.4rem">${show(c.published, c.unit)}</div></div></div>
+    <p style="font-size:.9rem">${esc(c.explanation)}</p><p class="muted" style="font-size:.8rem">${esc(c.source)}</p></div>`).join("");
+}
+
+/* ---------- sources ---------- */
+const TYPECLS = {"Measured":"good","Derived":"info","Literature-derived":"info","Transferred region":"warn","Transferred species":"bad","Assumed":"acc"};
+function vchip(v){
+  if (!v) return "";
+  if (/not found|unsourced|could not|not re-checked|not re-checkable|not independently/i.test(v)) return '<span class="chip warn">not fully verified</span>';
+  if (/CORRECTED|changed|Misapplied|replaces|Replaces/i.test(v)) return '<span class="chip acc">corrected 13 Oct</span>';
+  if (/confirmed|checked/i.test(v)) return '<span class="chip good">verified 13 Oct</span>';
+  return '<span class="chip info">reviewed</span>';
+}
+function renderCoefs(){
+  const only = $("#only-t").checked;
+  $("#coefs").innerHTML = Object.entries(C).filter(([, c]) => !only || c.transferred).map(([id, c]) => {
+    const v = Array.isArray(c.value) ? "4 corners (see map)" : c.value;
+    return `<div class="coef"><div class="id">${id}</div><div style="min-width:0"><b>${esc(c.parameter)}</b>
+      <div class="meta"><span class="chip ${TYPECLS[c.type]||'info'}">${esc(c.type)}</span>${c.transferred?'<span class="chip warn">borrowed</span>':''}${vchip(c.verified)}</div>
+      <p style="font-size:.88rem">${esc(c.plain_english)}</p>
+      <p class="num" style="font-size:.82rem;margin-top:4px">${esc(v)} ${esc(c.unit)} · range ${esc(c.range)}</p>
+      <details><summary>Source, how solid, verification</summary><p style="margin-top:6px">${esc(c.source)}</p><p style="margin-top:6px"><i>From:</i> ${esc(c.original_region)}</p><p style="margin-top:6px">${esc(c.how_solid)}</p><p style="margin-top:6px"><i>Verification:</i> ${esc(c.verified||"")}</p></details></div></div>`; }).join("");
+}
+$("#only-t").addEventListener("change", renderCoefs);
+
+/* ---------- report (generated by modules/report.py) ---------- */
+$("#report").textContent = D.reportMd;
+$("#copy").addEventListener("click", () => {
+  const msg = $("#copy-msg");
+  const sel = () => { const r = document.createRange(); r.selectNodeContents($("#report")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); msg.textContent = "Selected. Press Ctrl+C or ⌘C (or tap Copy) to copy."; };
+  try { navigator.clipboard.writeText(D.reportMd).then(() => msg.textContent = "Copied to clipboard.", sel); } catch(e) { sel(); }
+});
+
+/* ---------- boot ---------- */
+renderWhatIf(); initMap(); renderCarbon(); renderRange(); renderDrivers(); renderChecks(); renderCoefs();
+$("#foot").innerHTML = `SeaTrace model ${esc(D.modelVersion)} · Team 41, QUT · Varshitha, Moniesh, Khushi, Ramesh, Shraddha. Same model as the Python pipeline (central ${pct(D.python.durable_fraction)} of fixed carbon stored, point estimate ${kg(D.python.point_durable_co2)} CO₂). Coefficients checked against sources ${D.generated}. Coastline: ${esc(G.source)}.`;
+let start = "summary"; try { const s = localStorage.getItem("seatrace-tab"); if (s && TABS.some(t => t[0] === s)) start = s; } catch(e) {}
+if (location.hash && TABS.some(t => t[0] === location.hash.slice(1))) start = location.hash.slice(1);
+showTab(start);
+</script>

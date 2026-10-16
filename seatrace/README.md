@@ -1,117 +1,76 @@
 # SeaTrace
 
-**Team 41 — QUT Capstone**
-Varshitha · Moniesh · Khushi · Ramesh · Shraddha Chandana
+**Team 41, QUT Capstone** · Varshitha · Moniesh · Khushi · Ramesh · Shraddha Chandana
 
 > The science exists. The data is public. The layer connecting them does not.
 > SeaTrace builds that layer.
 
-## What this is
+Seaweed absorbs carbon, but when pieces break off and drift, nobody can prove
+where that carbon ends up: buried in the seabed or carried to deep water (real
+removal), or rotted and released (no benefit). SeaTrace estimates it for one
+farm from published science and free data, and reports an honest range with
+the working shown. **It is not a certified MRV system.**
 
-Seaweed absorbs carbon. But when fragments break off and drift, nobody can
-prove where that carbon ends up — buried on the seafloor (real removal),
-eaten and released back to the air (no benefit), or exported to deep water
-(real removal). This blocks seaweed carbon credits.
+## Result (Tower Bay, one trial season, model 2.0)
 
-SeaTrace is a **transparent, literature-informed prototype** that estimates
-carbon removal from free satellite imagery and published science, and
-reports it as an honest range with the working shown. **It is not a
-certified MRV system.** It documents its own assumptions, uncertainty, and
-limitations at every step.
+CO2 stored long term: **37 kg median, 90% range 13 to 95 kg** (5,000 Monte
+Carlo runs, seed 41). The trial was research-sized (~360 m of grow-line, assumed
+equal to the Tinderbox sister site). About 64% of the carbon the kelp fixed left
+in the harvest; most of what broke off rotted and was released.
 
-## Study site
+Model 2.0 (13 Oct 2026) replaced two wrong inputs from version 1 (7.9 ha of kelp
+and a wild-forest loss share of 0.71), which had given 1.4 t. Every coefficient
+now carries a `verified` note. See `docs/METHODOLOGY.md`. Not a certified carbon
+removal claim: no approved methodology for seaweed farms exists yet.
 
-IMAS lease, **Tower Bay near Dover, southeast Tasmania** (~43.3°S, 147.0°E —
-exact corners still to be confirmed, see coefficient N-09). Growing season:
-April–August.
+## Site
 
-**Species:** *Ecklonia radiata* (golden kelp) is the current working
-assumption, but Tower Bay grows three species (*Ecklonia radiata*,
-*Macrocystis pyrifera*, *Lessonia corrugata*) and this is not yet confirmed
-(see coefficient N-11 and the team's Blockers database in Notion). If the
-site is predominantly *Macrocystis*, coefficients N-01, N-02, and N-07 all
-need redoing.
+IMAS Scientific Research Permit site, Tower Bay, D'Entrecasteaux Channel,
+southeast Tasmania. 7.875 ha, *Macrocystis pyrifera* (giant kelp, confirmed by
+IMAS), trial season May to November 2024. The 7.9 ha is the permit area, not the
+area under kelp.
 
-## The five pieces
-
-1. **Biomass** — satellite imagery estimates how much seaweed grew (Moniesh)
-2. **Carbon** — published coefficients convert biomass to carbon (Khushi)
-3. **Fate** — where the carbon goes: buried, deep water, or released (Khushi)
-4. **Uncertainty** — run it 200+ times, report a range not a number (Shraddha Chandana)
-5. **Map + app** — visualise and deliver it (Ramesh + Varshitha)
-
-## Stack
-
-Python · Streamlit · GeoPandas · Folium
-
-## Project rules
-
-- **Nobody hardcodes numbers.** Everything comes from `config/coefficients.py`,
-  which mirrors the team's Notion Coefficients database.
-- **Push something every day**, even if broken.
-- **Weekly integration test, every Friday.** Non-negotiable.
-- **Nothing gets added without something being cut.** Log it in the Notion
-  Changes Log.
-- **Stuck for two hours? Ask the group.**
-
-Not allowed until Sprint 4: ML biomass prediction, original ocean
-circulation modelling, automated certification, real-time monitoring,
-registry integration, UI polish.
-
-## Getting started
+## Run it
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate  # or .venv\Scripts\activate on Windows
 pip install -r requirements.txt
+python -m pytest tests          # 15 tests
+python -m modules.report        # reports/seatrace_report.md + .json
 streamlit run app.py
 ```
+
+A phone-friendly HTML version of the app (same model, runs in the browser)
+is in `web/index.html`.
 
 ## Repo layout
 
 ```
-app.py                    Streamlit shell — wires everything together
+app.py                  Streamlit app: map, fate, uncertainty, sensitivity, validation, report
+config/coefficients.py  All coefficients N-01..N-21 with ranges, sources, caveats (mirrors Notion)
 modules/
-  biomass.py               get_biomass() — satellite biomass estimate (stub)
-  carbon.py                biomass_to_carbon() — biomass -> carbon (stub)
-  mapping.py                get_map() — Folium map of the study site
-  uncertainty.py            run_simulation() — Monte Carlo, 200+ runs (stub)
-config/
-  coefficients.py           All 14 coefficients (N-01..N-14): values, ranges,
-                             sources, and honest caveats. Single source of
-                             truth — mirrors the Notion Coefficients database.
-data/                       Local data cache (gitignored, kept via .gitkeep)
+  biomass.py            get_biomass(), season_series()            Moniesh   E2
+  carbon.py             biomass_to_carbon(), fate split           Khushi    E3/E4
+  fate.py               scenarios(), one_at_a_time()              Khushi    E4
+  uncertainty.py        run_simulation(), stability_check()       Shraddha  E5
+  validation.py         checks against published figures          Shraddha
+  dispersion.py         footprint(): decay x channel flushing     Ramesh    E6
+  mapping.py            Folium map: farm, depth basemap, footprint Ramesh   E6
+  report.py             build(), to_markdown(), write()           Ramesh    E7
+scripts/build_geo.py    builds data/geo.json (coastline + water-only routes)
+docs/METHODOLOGY.md     how to reproduce every number
+tests/                  pytest suite (also runs on GitHub Actions)
+web/index.html          standalone browser app
 ```
 
-## Status
+## Project rules
 
-Sprint 1 scaffold: all four modules are stubs, wired together end to end and
-smoke-tested. Real biomass/carbon/uncertainty logic depends on resolving the
-open blockers below.
+- **Nobody hardcodes numbers.** Everything comes from `config/coefficients.py`.
+- **Nothing gets added without something being cut.** Log it in the Notion Changes Log.
+- Weekly integration test every Friday: `python -m pytest tests`.
 
-## Open blockers (owner / due — see Notion Blockers database for current status)
+## Open questions
 
-| ID | Question | Owner | Due |
-|---|---|---|---|
-| B-05 | When is this project actually due? | Varshitha | 09-10 |
-| B-01 | Which species does Tower Bay actually grow? | Ramesh | 09-12 |
-| B-03 | How many cloud-free Sentinel-2 images across the season? | Moniesh | 09-12 |
-| B-04 | What is the carbon content of *Ecklonia radiata*? | Khushi | 09-12 |
-| B-02 | Is the farm big enough to see from satellite? | Moniesh | 09-10 |
-
-## Coefficients still needing real values
-
-See `config/coefficients.py` for the full set with sources and caveats.
-Currently unresolved (`TO FIND` / `TO CONFIRM` / `TO COUNT`):
-
-- **N-09** farm location (exact corners)
-- **N-10** farm area (hectares) — blocking, tied to B-02
-- **N-11** modelled species — blocking, tied to B-01
-- **N-12** usable Sentinel-2 scene count — blocking, tied to B-03
-- **N-13** dry matter fraction
-- **N-14** kelp yield per hectare (literature fallback insurance figure)
-- **N-01** carbon content of biomass — currently a cross-species placeholder
-  (*Saccharina*, not *Ecklonia*), tied to B-04
-
-Full project context, task tracking, and the live Coefficients/Blockers/
-Changes Log databases live in Notion: **🌊 SeaTrace — Team 41 Project Hub**.
+- Tower Bay grow-line length and 2024 harvest weight (ask IMAS); the result scales with them.
+- What happened to the harvested kelp (sold, composted or sunk).
+- Exact harvest date (late harvests lose far more kelp).
+- Source for N-18 = 0.24 (published upper boundary is 0.33).

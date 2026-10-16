@@ -1,73 +1,100 @@
 """
-Carbon — convert biomass to carbon using published coefficients.
+Carbon and fate - from harvested kelp to carbon stored long term.
 
-Owner: Khushi
-Epic 2 of 5. See config/coefficients.py for N-01 (carbon content of biomass)
-and N-13 (dry matter fraction).
+Owner: Khushi. Epics E3 (carbon) and E4 (fate model).
 
-Project rule: nobody hardcodes numbers - every coefficient here comes from
-config/coefficients.py.
+Revised 13 Oct 2026 after source verification. A farm is not a wild forest:
+most kelp is harvested and leaves the system, so only what is lost before
+harvest can be stored. Losses come from farm measurements (N-23, N-24),
+not the wild-forest detritus fraction (N-03, now comparison only).
+
+    harvested wet   W   = line length (N-22) x yield per metre (N-15)
+    dry             D   = W x dry matter fraction (N-13)
+    harvested C     Ch  = D x carbon content (N-01)
+    fixed C         Cf  = Ch / (1 - f_poc - f_doc)
+    lost as pieces  POC = Cf x f_poc (N-23)
+    released as DOC DOC = Cf x f_doc (N-24)
+
+    POC to deep sea       POC x N-04
+    POC buried on shelf   POC x (1 - N-04) x N-05    (Krause-Jensen & Duarte 2016)
+    DOC to deep water     DOC x N-18
+    everything else lost  released (remineralised, N-06)
+
+Stored long term = deep + buried. Harvested carbon is NOT counted: it is
+sold or used, and returns to the atmosphere on short timescales.
 """
 
-from config.coefficients import get_coefficient
+from config.coefficients import CO2_PER_C, get_value
+
+PARAM_IDS = {
+    "yield_kg_per_m": "N-15",
+    "dry_matter_fraction": "N-13",
+    "carbon_content_fraction": "N-01",
+    "poc_loss_fraction": "N-23",
+    "doc_release_fraction": "N-24",
+    "doc_deep_fraction": "N-18",
+    "poc_deep_fraction": "N-04",
+    "poc_burial_fraction": "N-05",
+}
 
 
-def biomass_to_carbon(wet_biomass_tonnes: float, coeffs: dict = None) -> dict:
-    """Convert wet biomass (tonnes) into an estimate of durable carbon.
+def default_params() -> dict:
+    """Central values for every model input, read from the register."""
+    return {name: float(get_value(cid)) for name, cid in PARAM_IDS.items()}
 
-    Sprint 1: stub. Uses N-01 (carbon content of biomass, currently a
-    cross-species Saccharina placeholder - see Blocker B-04) and N-13 (dry
-    matter fraction, currently TO FIND) where available, otherwise falls back
-    to a documented placeholder so the pipeline can still be smoke-tested.
 
-    Args:
-        wet_biomass_tonnes: Wet biomass estimate, e.g. from
-            modules.biomass.get_biomass().
-        coeffs: Optional dict of override coefficients, e.g.
-            {"dry_matter_fraction": 0.12, "carbon_content_fraction": 0.252}.
-            When omitted, values are pulled from config/coefficients.py.
+def harvest_wet_tonnes(p: dict, line_m: float = None) -> float:
+    line_m = line_m if line_m is not None else get_value("N-22")
+    return line_m * p["yield_kg_per_m"] / 1000.0
 
-    Returns:
-        dict with:
-            total_carbon_tonnes (float): total carbon in the dry biomass
-            durable_carbon_tonnes (float): the portion assumed durable
-                (sanity check: always <= total_carbon_tonnes)
-            assumptions (dict): which coefficients/fallbacks were used
+
+def fate_split(p: dict) -> dict:
+    """Fates per unit of carbon FIXED by the kelp."""
+    poc, doc = p["poc_loss_fraction"], p["doc_release_fraction"]
+    poc_deep = poc * p["poc_deep_fraction"]
+    buried = poc * (1 - p["poc_deep_fraction"]) * p["poc_burial_fraction"]
+    doc_deep = doc * p["doc_deep_fraction"]
+    harvested = 1 - poc - doc
+    deep = poc_deep + doc_deep
+    released = poc + doc - deep - buried
+    return {"harvested": harvested, "poc_lost": poc, "doc_released": doc,
+            "poc_deep": poc_deep, "doc_deep": doc_deep, "deep": deep,
+            "buried": buried, "released": released, "durable": deep + buried}
+
+
+def biomass_to_carbon(wet_harvest_tonnes: float, coeffs: dict = None) -> dict:
+    """Harvested wet kelp (t) -> carbon fixed and its fates (t C).
+
+    `coeffs` overrides any entry of default_params().
     """
-    coeffs = coeffs or {}
+    p = default_params()
+    p.update(coeffs or {})
+    if p["poc_loss_fraction"] + p["doc_release_fraction"] >= 1:
+        raise ValueError("Losses must be less than all carbon fixed")
 
-    carbon_content_fraction = coeffs.get(
-        "carbon_content_fraction", get_coefficient("N-01")["value"]
-    )
+    dry = wet_harvest_tonnes * p["dry_matter_fraction"]
+    c_harv = dry * p["carbon_content_fraction"]
+    f = fate_split(p)
+    c_fix = c_harv / f["harvested"]
 
-    # N-13 (dry matter fraction) is still "TO FIND" in Notion. Use the
-    # documented literature range midpoint (0.10-0.15) as an explicit,
-    # labelled placeholder rather than silently guessing.
-    dry_matter_fraction = coeffs.get("dry_matter_fraction", 0.125)
-
-    dry_biomass_tonnes = wet_biomass_tonnes * dry_matter_fraction
-    total_carbon_tonnes = dry_biomass_tonnes * carbon_content_fraction
-
-    # Durable carbon is always a subset of total carbon extracted from
-    # biomass - this is the sanity check every future refinement must keep
-    # passing. Sprint 1 stub: assume a conservative 50% durability pending
-    # the Fate module (fate.py, Epic 3) actually splitting buried / deep
-    # water / released.
-    durable_fraction_placeholder = 0.5
-    durable_carbon_tonnes = total_carbon_tonnes * durable_fraction_placeholder
-
-    assert durable_carbon_tonnes <= total_carbon_tonnes, (
-        "Sanity check failed: durable carbon cannot exceed total carbon"
-    )
-
-    return {
-        "total_carbon_tonnes": total_carbon_tonnes,
-        "durable_carbon_tonnes": durable_carbon_tonnes,
-        "assumptions": {
-            "carbon_content_fraction": carbon_content_fraction,
-            "carbon_content_source": "N-01 (cross-species Saccharina placeholder, see Blocker B-04)",
-            "dry_matter_fraction": dry_matter_fraction,
-            "dry_matter_source": "N-13 is TO FIND; using literature range midpoint 0.125 as placeholder",
-            "durable_fraction_placeholder": durable_fraction_placeholder,
-        },
+    out = {
+        "wet_t": wet_harvest_tonnes,
+        "dry_t": dry,
+        "harvested_c_t": c_harv,
+        "carbon_t": c_fix,
+        "exported_t": c_fix * (f["poc_lost"] + f["doc_released"]),
+        "buried_t": c_fix * f["buried"],
+        "deep_t": c_fix * f["deep"],
+        "released_t": c_fix * f["released"],
+        "durable_t": c_fix * f["durable"],
+        "durable_co2_t": c_fix * f["durable"] * CO2_PER_C,
+        "fractions": f,
+        "params": p,
     }
+    out["retained_t"] = c_harv
+    out["total_carbon_tonnes"] = c_fix
+    out["durable_carbon_tonnes"] = out["durable_t"]
+    assert out["durable_t"] <= out["exported_t"] <= c_fix
+    assert abs(c_harv + out["buried_t"] + out["deep_t"] + out["released_t"] - c_fix) < 1e-9
+    return out
+

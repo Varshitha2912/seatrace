@@ -1,6 +1,9 @@
 streamlit>=1.35
-geopandas>=0.14
-folium>=0.16
 streamlit-folium>=0.20
+folium>=0.16
 numpy>=1.26
-shapely>=2.0
+pandas>=2.0
+pytest>=8.0
+# only needed to rebuild data/geo.json:
+# global-land-mask>=1.0
+# matplotlib>=3.8

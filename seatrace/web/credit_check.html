@@ -1,0 +1,331 @@
+<title>SeaTrace Credit Check</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Source+Serif+4:ital,opsz,wght@1,8..60,400&display=swap">
+<style>
+/* Layout: a nautical-chart reading of a carbon report. Water-blue ground, chart-buff land,
+   magenta for notices, one tab visible at a time under a sticky chart-style nav. */
+:root{
+  --water:#e3eff3; --surface:#f6fafb; --land:#ead9a6; --land-edge:#b9a46a;
+  --ink:#122d37; --muted:#56707a; --rule:#c4d7dd;
+  --accent:#a3266b; --accent-soft:#f6e3ee;
+  --deep:#1d4f8f; --buried:#86601c; --released:#98a7ad; --kelp:#5f7a2c;
+  --good:#2d7a4b; --warn:#a86a10; --bad:#b03434;
+  --f-display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --f-water:"Source Serif 4",Georgia,serif;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --water:#0c1c23; --surface:#12262e; --land:#2e2c20; --land-edge:#58533a;
+  --ink:#e2eef1; --muted:#8ea5ad; --rule:#23404a;
+  --accent:#ea72ad; --accent-soft:#3a1a2b;
+  --deep:#73a6ea; --buried:#d0a75a; --released:#5e7178; --kelp:#9fbb5c;
+  --good:#5cc187; --warn:#e0a548; --bad:#ec7a7a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --water:#0c1c23; --surface:#12262e; --land:#2e2c20; --land-edge:#58533a;
+  --ink:#e2eef1; --muted:#8ea5ad; --rule:#23404a;
+  --accent:#ea72ad; --accent-soft:#3a1a2b;
+  --deep:#73a6ea; --buried:#d0a75a; --released:#5e7178; --kelp:#9fbb5c;
+  --good:#5cc187; --warn:#e0a548; --bad:#ec7a7a; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--water);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:980px;margin:0 auto;padding-inline:16px;padding-block:0 48px}
+h1,h2,h3{font-family:var(--f-display);font-weight:600;letter-spacing:.01em;text-wrap:balance;margin:0;line-height:1.1}
+h2{font-size:1.6rem}
+h3{font-size:1.15rem;letter-spacing:.02em}
+p{margin:0}
+.muted{color:var(--muted)}
+.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.eyebrow{font-family:var(--f-display);font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.stack{display:flex;flex-direction:column;gap:14px}
+.card{background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);padding:16px;min-width:0}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr));gap:14px}
+
+/* header */
+header.top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-block:20px 12px}
+.brand{display:flex;align-items:baseline;gap:10px}
+.brand h1{font-size:2.1rem;font-weight:700;letter-spacing:.02em}
+.brand .tag{font-family:var(--f-display);font-size:.95rem;color:var(--accent);letter-spacing:.08em;text-transform:uppercase;font-weight:600}
+.site{font-size:.85rem;color:var(--muted)}
+@media (min-width:720px){.site{text-align:right}}
+
+/* nav */
+nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--water);border-bottom:2px solid var(--ink);margin-bottom:18px;overflow-x:auto;scrollbar-width:none}
+nav.tabs::-webkit-scrollbar{display:none}
+nav.tabs .row{display:flex;gap:2px;min-width:max-content}
+nav.tabs button{font-family:var(--f-display);font-size:1rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;background:none;border:0;color:var(--muted);padding:10px 12px 8px;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px}
+nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+nav.tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+
+/* hero */
+.hero{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:20px;align-items:end}
+@media (max-width:720px){.hero{grid-template-columns:1fr}}
+.big{font-family:var(--f-display);font-weight:700;font-size:clamp(3.6rem,13vw,6.2rem);line-height:.9;letter-spacing:-.01em}
+.big small{font-size:.38em;font-weight:600;margin-left:6px;letter-spacing:.02em}
+.lede{font-size:1.05rem;max-width:58ch}
+.rangebar{position:relative;height:46px;margin-top:6px}
+.rangebar .track{position:absolute;left:0;right:0;top:20px;height:4px;background:var(--rule);border-radius:2px}
+.rangebar .span{position:absolute;top:16px;height:12px;background:var(--deep);opacity:.25;border-radius:6px}
+.rangebar .tick{position:absolute;top:10px;width:2px;height:24px;background:var(--deep)}
+.rangebar .lab{position:absolute;top:34px;font-size:.75rem;transform:translateX(-50%);white-space:nowrap;color:var(--muted)}
+.rangebar .pt{position:absolute;top:14px;width:12px;height:12px;border:2px solid var(--accent);background:var(--surface);border-radius:50%;transform:translateX(-50%)}
+
+/* flow bar */
+.flow{display:flex;height:34px;border-radius:6px;overflow:hidden;border:1px solid var(--rule)}
+.flow div{height:100%}
+.legend{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:.85rem;margin-top:10px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:12px;height:12px;border-radius:3px;display:inline-block;flex:none}
+
+/* sliders */
+.ctl{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center}
+.ctl label{font-size:.9rem}
+.ctl output{font-family:var(--f-mono);font-size:.85rem;color:var(--accent)}
+.ctl input[type=range]{grid-column:1/-1;width:100%;accent-color:var(--accent)}
+.ctl .hint{grid-column:1/-1;font-size:.75rem;color:var(--muted)}
+button.btn{font-family:var(--f-display);font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:.95rem;border:1.5px solid var(--ink);background:var(--ink);color:var(--surface);padding:8px 14px;border-radius:6px;cursor:pointer}
+button.btn.ghost{background:transparent;color:var(--ink)}
+button.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+select{font:inherit;padding:6px 8px;border-radius:6px;border:1px solid var(--rule);background:var(--surface);color:var(--ink)}
+
+/* tables */
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.88rem}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-family:var(--f-display);font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:.78rem;color:var(--muted)}
+td.r,th.r{text-align:right}
+
+/* chips */
+.chip{display:inline-block;font-family:var(--f-display);font-weight:600;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
+.chip.good{color:var(--good)} .chip.warn{color:var(--warn)} .chip.bad{color:var(--bad)} .chip.info{color:var(--deep)} .chip.acc{color:var(--accent)}
+
+/* map */
+.mapbox{position:relative;border:1px solid var(--rule);border-radius:var(--r);overflow:hidden;background:var(--water)}
+.mapbox svg{display:block;width:100%;height:auto}
+.landfill{fill:var(--land);stroke:var(--land-edge);stroke-width:.8}
+.wlabel{font-family:var(--f-water);font-style:italic;fill:var(--deep);font-size:13px}
+.llabel{font-family:var(--f-display);font-weight:600;letter-spacing:.12em;text-transform:uppercase;fill:var(--muted);font-size:12px}
+.notice{border-left:3px solid var(--accent);background:var(--accent-soft);padding:10px 12px;border-radius:0 6px 6px 0;font-size:.88rem}
+
+/* coefficient list */
+.coef{display:grid;grid-template-columns:62px minmax(0,1fr);gap:4px 12px;padding:12px 0;border-bottom:1px solid var(--rule)}
+.coef .id{font-family:var(--f-mono);font-weight:500;color:var(--accent)}
+.coef .meta{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0}
+.coef details{font-size:.85rem;color:var(--muted)}
+.coef summary{cursor:pointer;color:var(--ink)}
+pre.report{white-space:pre-wrap;word-break:break-word;font-family:var(--f-mono);font-size:.78rem;background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);padding:14px;max-height:70vh;overflow:auto}
+.foot{margin-top:28px;font-size:.8rem;color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){.flow div,.rangebar .span,.rangebar .tick,.rangebar .pt{transition:all .25s ease}}
+
+/* buyer prototype additions */
+.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:14px}
+.field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.field label{font-size:.88rem;font-weight:500}
+.field .hint{font-size:.75rem;color:var(--muted)}
+.field input[type=number],.field input[type=text],.field select{font:inherit;font-family:var(--f-mono);font-size:.95rem;padding:8px 10px;border-radius:6px;border:1px solid var(--rule);background:var(--water);color:var(--ink);width:100%}
+.field input:focus-visible,.field select:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.checks{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:8px 16px}
+.checks label{display:flex;gap:8px;align-items:flex-start;font-size:.9rem}
+.checks input{margin-top:4px;accent-color:var(--accent)}
+.verdict{border-radius:var(--r);padding:16px;border:2px solid currentColor;display:grid;gap:6px}
+.verdict.good{color:var(--good)} .verdict.warn{color:var(--warn)} .verdict.bad{color:var(--bad)}
+.verdict h3,.verdict p{color:var(--ink)}
+.verdict .tag{font-family:var(--f-display);font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-size:.85rem}
+.flags{display:grid;gap:10px}
+.flag{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 10px;align-items:start;font-size:.9rem}
+.flag .sev{font-family:var(--f-display);font-weight:700;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
+.sev.high{color:var(--bad)} .sev.med{color:var(--warn)} .sev.low{color:var(--deep)}
+.steps{counter-reset:s;display:grid;gap:10px;padding:0;margin:0;list-style:none}
+.steps li{counter-increment:s;display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;font-size:.92rem}
+.steps li::before{content:counter(s);font-family:var(--f-display);font-weight:700;font-size:1.1rem;color:var(--accent)}
+.example{font-size:.8rem;color:var(--accent);font-family:var(--f-display);letter-spacing:.08em;text-transform:uppercase;font-weight:600}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><h1>SeaTrace</h1><span class="tag">Credit check</span></div>
+    <div class="site">Independent check of seaweed carbon credit claims<br><span class="num">prototype · model 2.0 · giant kelp</span></div>
+  </header>
+
+  <div class="stack" style="gap:18px">
+    <div class="stack" style="gap:6px">
+      <h2 style="font-size:clamp(1.7rem,6vw,2.4rem)">Is this seaweed farm's carbon claim believable?</h2>
+      <p class="lede muted">Enter what the seller has told you. SeaTrace estimates what the farm could plausibly have stored, compares it with the claim, and lists the evidence to ask for before you buy.</p>
+    </div>
+
+    <form class="card stack" id="f" novalidate>
+      <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline">
+        <h3>1 · The farm and its claim</h3><span class="example" id="ex-tag">Filled with an example farm</span>
+      </div>
+      <div class="form">
+        <div class="field"><label for="name">Farm name</label><input type="text" id="name" value="Example Bay Kelp Co. (illustrative)"></div>
+        <div class="field"><label for="species">Species</label>
+          <select id="species"><option value="mac" selected>Giant kelp (Macrocystis)</option><option value="other">Another seaweed</option></select>
+          <span class="hint">SeaTrace's numbers are set for giant kelp.</span></div>
+        <div class="field"><label for="line">Grow-line in the water (m)</label><input type="number" id="line" min="1" step="10" value="20000">
+          <span class="hint">Total rope length, all lines.</span></div>
+        <div class="field"><label for="harvest">Harvest weight, if known (t wet)</label><input type="number" id="harvest" min="0" step="0.1" value="200">
+          <span class="hint">Leave blank to estimate from line length.</span></div>
+        <div class="field"><label for="timing">Harvest timing</label>
+          <select id="timing"><option value="ontime" selected>Normal (before water warms)</option><option value="late">Late (into warming water)</option><option value="unknown">Unknown</option></select>
+          <span class="hint">Late harvests lose far more kelp before cutting.</span></div>
+        <div class="field"><label for="fate">What happens to the harvest</label>
+          <select id="fate"><option value="sold" selected>Sold or used (food, feed, products)</option><option value="sunk">Sunk in the deep ocean</option><option value="unknown">Unknown</option></select></div>
+        <div class="field"><label for="seabed">Seabed under the farm</label>
+          <select id="seabed"><option value="sand" selected>Sand or rock</option><option value="mud">Soft mud</option><option value="unknown">Unknown</option></select></div>
+        <div class="field"><label for="claim">Credits claimed for this season (t CO₂)</label><input type="number" id="claim" min="0" step="0.1" value="50"></div>
+      </div>
+
+      <h3 style="margin-top:6px">2 · Evidence the seller has</h3>
+      <div class="checks" id="evidence"></div>
+
+      <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" type="submit">Check this claim</button><button class="btn ghost" type="button" id="clear">Start blank</button></div>
+    </form>
+
+    <section class="stack" id="out" aria-live="polite"></section>
+  </div>
+  <p class="foot" id="foot"></p>
+</div>
+
+<script>
+const D = {"generated":"2026-10-13","co2PerC":3.6666666666666665,"coef":{"N-01":{"parameter":"Carbon content of biomass","plain_english":"If you dry the kelp, what fraction of what's left is carbon.","value":0.3,"low":0.24,"high":0.33,"dist":"triangular","unit":"fraction of dry weight","range":"0.24 - 0.33","source":"Reed & Brzezinski (2009): ~30% of Macrocystis dry weight is carbon (as used by Bayley et al. 2017, Falklands). Bell & Kroeker (2022) J. Phycol. 58:773, Alaska: blade carbon 29.0 +/- 0.3% of dry mass year-round. SBC LTER data imply ~28% and note 20-40% variation. 0.3217 (Reed & Miller 2021, via Gould et al. 2025) kept as the upper end; not independently re-checked.","original_region":"California - Macrocystis pyrifera","type":"Transferred region","transferred":true,"how_solid":"GOOD species match, several consistent sources (0.28-0.32). Not measured on Tasmanian farmed kelp.","owner":"Khushi","verified":"13 Oct 2026: 30% (Reed & Brzezinski 2009, via Bayley 2017) and 29.0% (Bell & Kroeker 2022) confirmed; ~28% from SBC LTER dataset. Central changed from 0.3217 to 0.30."},"N-02":{"parameter":"Detrital decay rate","plain_english":"Once a piece of kelp breaks off, how fast it rots away.","value":0.075,"low":0.007,"high":0.106,"dist":"loguniform","unit":"per day","range":"0.007 - 0.106 (widened 2 Oct 2026)","source":"Van der Mheen et al. (2024) Sci. Rep. 14 (doi:10.1038/s41598-023-51003-5): 'k = 0.075 +/- 0.031 per day is the decay rate for Ecklonia radiata as determined in situ on the WCS by Simpkins et al.' (half-life 9.2 +/- 2.7 days). Lower bound: Filbee-Dexter et al. (2020), ~0.74%/day mean across 35 sites.","original_region":"Western Australia continental shelf","type":"Transferred species","transferred":true,"how_solid":"WEAK - transferred across species (Ecklonia -> Macrocystis) and region (WA -> Tasmania). Published rates disagree ~10x, so sampled log-uniformly. Used only for the dispersion footprint.","owner":"Khushi","verified":"13 Oct 2026: 0.075 +/- 0.031 per day confirmed in van der Mheen et al. 2024 Methods (Ecklonia radiata, in situ, Wadjemup/Rottnest shelf, WA; original Simpkins et al.). Transfer to Tasmanian Macrocystis remains a caveat. Display only."},"N-03":{"parameter":"Detritus export fraction (wild forests)","plain_english":"In a wild kelp forest, how much of everything it grows breaks off as detritus. Not used for the farm, where most kelp is harvested.","value":0.71,"low":0.65,"high":0.77,"dist":"fixed","unit":"fraction of net primary production","range":"0.71 +/- 0.06 SE","source":"Filbee-Dexter et al. (2024), Carbon export from seaweed forests to deep ocean sinks, Nature Geoscience: 'the fraction of the production that is exported as detritus (71% +/- 6 SE)'.","original_region":"Global synthesis of wild seaweed forests","type":"Literature-derived","transferred":true,"how_solid":"VERIFIED value, but it applies to wild forests, not farms. Replaced in the farm model by N-23 and N-24 (13 Oct 2026). Used only in the wild-forest comparison.","owner":"Khushi","verified":"13 Oct 2026: value confirmed in the paper. Misapplied to a farm before; now comparison only."},"N-04":{"parameter":"POC exported to deep sea","plain_english":"Of the kelp pieces that drift away, how much sinks to deep water where the carbon stays locked up.","value":0.11,"low":0.05,"high":0.17,"dist":"uniform","unit":"fraction of exported POC","range":"0.05 - 0.17 (assumed; low end = N-07 sheltered-channel case)","source":"Krause-Jensen & Duarte (2016), Nature Geoscience 9, 737-742: about 11% of POC export (35 TgC/yr) reaches the deep sea.","original_region":"Global","type":"Literature-derived","transferred":true,"how_solid":"VERIFIED value and basis (fraction of POC export). Global; a sheltered 15 m channel probably exports less, hence the low end.","owner":"Khushi","verified":"13 Oct 2026: 11% of POC export confirmed in the paper."},"N-05":{"parameter":"POC buried in shelf sediment","plain_english":"Of the kelp pieces that stay on the shelf, how much settles into the seabed and stays there.","value":0.046,"low":0.02,"high":0.06,"dist":"uniform","unit":"fraction of POC retained on the shelf","range":"0.02 - 0.06 (assumed)","source":"Krause-Jensen & Duarte (2016): of the 89% of POC export retained on the shelf, 'an estimated 4.6% (14 TgC/yr) is buried in shelf sediments'.","original_region":"Global","type":"Literature-derived","transferred":true,"how_solid":"VERIFIED value and basis. Khushi's 0.046 was right; the old Notion row (0.04 of exported POC) had the wrong basis.","owner":"Khushi","verified":"13 Oct 2026: 4.6% of shelf-retained POC confirmed in the paper."},"N-06":{"parameter":"Remineralised fraction","plain_english":"Everything else: eaten or rotted, so the carbon goes back to the water and air. No climate benefit.","value":"calculate as residual","low":null,"high":null,"dist":"fixed","unit":"fraction of exported carbon","range":"wide","source":"Residual of the fate tree. Cross-check: deep ocean monitoring reports >90% remineralisation.","original_region":"n/a","type":"Derived","transferred":false,"how_solid":"UNCERTAIN. Our tree implies ~80%; lab studies suggest >90%. That gap is reported as uncertainty, not resolved away.","owner":"Khushi","verified":"13 Oct 2026: residual, no source needed. Monitoring >90% cross-check not re-checked."},"N-07":{"parameter":"Cross-shelf export with decay","plain_english":"How much detritus gets past the continental shelf edge after rotting on the way.","value":0.21,"low":0.05,"high":0.51,"dist":"uniform","unit":"fraction","range":"0.05 - 0.51 (widened 2 Oct 2026)","source":"van der Mheen et al. (2024), Scientific Reports 14: 51%/yr passes the shelf edge, 17-29% after decomposition.","original_region":"Western Australia continental shelf","type":"Transferred species","transferred":true,"how_solid":"WEAK - open WA shelf vs sheltered D'Entrecasteaux Channel. Used in the 'sheltered channel' sensitivity scenario.","owner":"Khushi","verified":"13 Oct 2026: 51%/yr past the shelf edge, 17-29% with decomposition, confirmed (van der Mheen et al. 2024 abstract)."},"N-08":{"parameter":"Growing season window","plain_english":"When the kelp was in the water growing at Tower Bay.","value":"May to November 2024","low":null,"high":null,"dist":"fixed","months":["May","Jun","Jul","Aug","Sep","Oct","Nov"],"unit":"months","range":"n/a","source":"Blue Economy CRC harvest note (22 Nov 2024): Tinderbox harvested ~6 months after outplanting; Tower Bay due for harvest the following week. Matches N-12 (14 clear scenes May-Nov 2024). Biancacci et al. (2022): April deployment, harvest window July-August in other Tasmanian sites.","original_region":"Southeast Tasmania","type":"Measured","transferred":false,"how_solid":"GOOD for the 2024 trial. The 2023-24 trial was killed by the summer heatwave; the 2025-26 trial ran Jun-Feb. Was 'April - August' before 13 Oct 2026, which did not match Tower Bay.","owner":"Moniesh","verified":"13 Oct 2026: changed from April-August to the 2024 trial window."},"N-09":{"parameter":"Farm location","plain_english":"Exactly where the farm is.","value":[[-43.387917,147.034183],[-43.389583,147.039067],[-43.390967,147.037833],[-43.389333,147.033033]],"centroid":[-43.38945,147.036029],"low":null,"high":null,"dist":"fixed","unit":"lat / lon (WGS84)","range":"n/a","source":"MAST Notice to Mariners M276-26(T), D'Entrecasteaux Channel, Tower Bay - Mooring Works, 4 Aug 2026.","original_region":"Southeast Tasmania","type":"Measured","transferred":false,"how_solid":"GOOD - authoritative government source. IMAS Scientific Research Permit site, active to 30 July 2027.","owner":"Ramesh","verified":"13 Oct 2026: all four corners confirmed against MAST M276-26(T) and M178-21(T). Notice describes the permit area only, not the kelp infrastructure."},"N-10":{"parameter":"Farm area","plain_english":"How big the farm is.","value":7.875,"low":null,"high":null,"dist":"fixed","unit":"hectares","range":"n/a","source":"Shoelace formula on the N-09 corners (~436 x 184 m).","original_region":"Southeast Tasmania","type":"Measured","transferred":false,"how_solid":"GOOD - derived from an authoritative coordinate source. ~787 Sentinel-2 pixels.","owner":"Moniesh","verified":"13 Oct 2026: geodesic area of N-09 = 7.873 ha (pyproj, WGS84). This is the permit area, not the area under kelp."},"N-11":{"parameter":"Modelled species","plain_english":"Which seaweed we model.","value":"Macrocystis pyrifera (giant kelp)","low":null,"high":null,"dist":"fixed","unit":"n/a","range":"n/a","source":"Confirmed by Jeffrey Wright (IMAS) by email: three successful Macrocystis trials at Tower Bay, last ended Feb 2026.","original_region":"Southeast Tasmania","type":"Measured","transferred":false,"how_solid":"GOOD - resolved (B-01).","owner":"Ramesh","verified":"13 Oct 2026: IMAS email not re-checkable by Claude; CRC pages confirm Macrocystis trials at Tower Bay."},"N-12":{"parameter":"Usable Sentinel-2 scenes","plain_english":"How many clear satellite images cover the farm during a trial.","value":"14 clear (May-Nov 2024); 24 clear (Jun 2025-Feb 2026)","scenes":[{"window":"May-Nov 2024","clear":14},{"window":"Jun 2025-Feb 2026","clear":24}],"low":null,"high":null,"dist":"fixed","unit":"scenes per trial","range":"n/a","source":"Copernicus Browser statistical time series, Sentinel-2 L2A over the N-09 polygon, 161 acquisitions (redone 2 Oct 2026).","original_region":"Southeast Tasmania","type":"Measured","transferred":false,"how_solid":"GOOD for counts. Kelp signal in NDVI is faint: satellite gives timing, not tonnes (Changes Log C-005).","owner":"Moniesh","verified":"13 Oct 2026: not re-checked (Copernicus counts from 2 Oct). Windows agree with the CRC harvest note."},"N-13":{"parameter":"Dry matter fraction","plain_english":"How much of the wet kelp is solid matter rather than water.","value":0.1,"low":0.055,"high":0.12,"dist":"triangular","unit":"fraction of wet weight","range":"0.055 - 0.12","source":"Reed & Brzezinski (2009): dry weight 10% of wet (as used by Bayley et al. 2017); Bell & Kroeker (2022): mean 10.3%, observed 8.8-12.6% (Alaska); Duarte et al. (2017) use 0.1; FAO (North America) 88.2% water = 0.118. Low end 0.055: Forbes et al. (2025) J. Phycol., a 1970-71 company wet-to-dry factor from harvest records; the paper does not say how 'dry weight' was measured.","original_region":"California / North America; Tasmania for the low end","type":"Literature-derived","transferred":true,"how_solid":"GOOD central (four sources at 0.09-0.12). The Tasmanian 0.055 is an outlier until its method is checked. Was central 0.055 before 13 Oct 2026.","owner":"Khushi","verified":"13 Oct 2026: 0.10 confirmed (Reed & Brzezinski via Bayley; Bell & Kroeker 10.3%, 8.8-12.6%). Forbes 2025 read: 0.055 is a factory-record ratio with unstated drying method, so kept only as the low end. Central changed from 0.055."},"N-14":{"parameter":"Kelp yield per hectare (wild forests)","plain_english":"How much kelp a hectare of wild Tasmanian forest holds. Used only for the full-scale farm scenario.","value":12.0,"low":10.0,"high":20.0,"dist":"triangular","unit":"tonnes wet per hectare","range":"10 - 20 t/ha","source":"Forbes et al. (2025) J. Phycol.: earlier Tasmanian surveys 'potential yield of ~1000-1200 t/km2'; Alginates Australia 'mean = 1200 t/km2; maximum = 2000 t/km2'. These are per-harvest standing crop; forests 'could generally sustain only one harvest per year'. Wet weight inferred, not stated.","original_region":"Tasmania - wild Macrocystis forests, 1970s","type":"Transferred region","transferred":true,"how_solid":"Wild-forest standing crop, not a farm yield. The trial did not cover the 7.9 ha permit area, so this is no longer used for the Tower Bay estimate (13 Oct 2026); only for the 'full-scale farm' scenario.","owner":"Moniesh","verified":"13 Oct 2026: figures confirmed in Forbes 2025 (per-harvest standing crop, wet weight inferred). Used only for the full-scale scenario. For comparison, a modelled 16 ha Macrocystis longline farm yields ~20 wet t/ha/yr (Frieder et al. 2022)."},"N-15":{"parameter":"Farm yield per metre of grow-line","plain_english":"Kelp grown per metre of line on the IMAS trial leases.","value":10.0,"low":1.2,"high":12.0,"dist":"triangular","unit":"kg wet per metre of line (~6 months)","range":"1.2 - 12","source":"Blue Economy CRC (22 Nov 2024): ~3.6 t of Macrocystis grown at Tinderbox on 360 m of grow-line in ~6 months = 10 kg/m. Low end: Biancacci et al. (2022) Front. Mar. Sci. 9:951538, mean 1.20 kg/m (max 1.5) for farmed Macrocystis at two Tasmanian sites, 2020.","original_region":"Southeast Tasmania - Tinderbox lease (same IMAS project as Tower Bay)","type":"Transferred region","transferred":true,"how_solid":"GOOD project and species match. CORRECTED 13 Oct 2026: was 75 kg/m, from dividing the whole-lease 3.6 t by the 48 m harvested. The CRC note says 3.6 t was grown on 360 m in total.","owner":"Moniesh","verified":"13 Oct 2026: CRC article re-read; Biancacci 2022 checked."},"N-16":{"parameter":"Grow-line depth and site water depth","plain_english":"How deep the lines sit and how deep the water is.","value":"Lines ~5 or 10 m below surface; ~15 m water over sand","line_depth_m":7.5,"water_depth_m":15.0,"low":null,"high":null,"dist":"fixed","unit":"metres","range":"Lines 5-10 m","source":"Blue Economy CRC, Developing Production Systems for Offshore Kelp Mariculture; Biancacci et al. (2022) Front. Mar. Sci.","original_region":"Southeast Tasmania - Tinderbox description","type":"Assumed","transferred":true,"how_solid":"ASSUMED for Tower Bay from the same IMAS project. Explains the faint satellite signal.","owner":"Moniesh","verified":"13 Oct 2026: confirmed on the CRC kelp mariculture page (lines ~5 or 10 m; ~15 m water over sand at Tinderbox)."},"N-17":{"parameter":"DOC share of exported carbon","plain_english":"Of the carbon that leaves the farm, how much leaves dissolved in the water rather than as pieces.","value":0.52,"low":0.4,"high":0.6,"dist":"uniform","unit":"fraction of exported carbon","range":"0.40 - 0.60 (assumed)","source":"Khushi's durable_fraction.py (8 Oct 2026), nested structure after Krause-Jensen & Duarte (2016). Registered 13 Oct 2026 (was mislabelled N-16 in the script).","original_region":"Global","type":"Literature-derived","transferred":true,"how_solid":"OK. Central value from the fate script; range assumed. Khushi to confirm the primary source.","owner":"Khushi","verified":"13 Oct 2026: DOC = 52% of macroalgal export confirmed in Krause-Jensen & Duarte 2016. Used only in the wild-forest comparison."},"N-18":{"parameter":"DOC reaching deep water","plain_english":"Of the dissolved carbon the kelp releases, how much reaches deep water and stays there.","value":0.24,"low":0.15,"high":0.33,"dist":"uniform","unit":"fraction of DOC","range":"0.15 - 0.33","source":"Upper end: Krause-Jensen & Duarte (2016), 33% of DOC exported below the mixed layer, which they call an upper boundary (their Table 1 lists 30%). Central 0.24 from Khushi's durable_fraction.py; no primary source found 13 Oct 2026.","original_region":"Global","type":"Assumed","transferred":true,"how_solid":"WEAK central: unsourced. 0.33 is a published upper boundary. Refractory DOC literature ranges 5-78% (Watanabe et al. 2020; Neves et al. 2025).","owner":"Khushi","verified":"13 Oct 2026: 0.33 upper boundary confirmed; 0.24 unsourced. Type changed to Assumed."},"N-19":{"parameter":"Channel flushing time","plain_english":"How many days water stays in the D'Entrecasteaux Channel before flowing out.","value":23.0,"low":20.0,"high":26.0,"dist":"uniform","unit":"days","range":"20 (winter, whole channel) - 26 (overall)","source":"CSIRO hydrodynamic model of the D'Entrecasteaux Channel (2003-06).","original_region":"D'Entrecasteaux Channel, Tasmania","type":"Literature-derived","transferred":false,"how_solid":"GOOD - local model. Used only for the dispersion footprint.","owner":"Ramesh","verified":"13 Oct 2026: confirmed, CSIRO (Marine and Freshwater Research MF09134): whole-region flushing ~20-26 days."},"N-20":{"parameter":"Share of outflow leaving north","plain_english":"Of the water leaving the channel, how much goes north to Storm Bay rather than south.","value":0.75,"low":0.6,"high":0.9,"dist":"uniform","unit":"fraction","range":"0.60 - 0.90 (assumed)","source":"CSIRO D'Entrecasteaux Channel model: most water leaves north into Storm Bay, a smaller share south. Exact split not published; 0.75 assumed.","original_region":"D'Entrecasteaux Channel, Tasmania","type":"Assumed","transferred":false,"how_solid":"ASSUMED split; direction is from the CSIRO model. Display only, does not change the carbon estimate.","owner":"Ramesh","verified":"13 Oct 2026: direction confirmed (predominantly northward, small share south); CSIRO gives no percentage, so 0.75 stays assumed. CSIRO also notes the northern channel connects poorly with the rest."},"N-21":{"parameter":"Seasonal growth curve","plain_english":"The shape of growth through the season: slow start, fast middle, levelling off.","value":1.2,"low":null,"high":null,"dist":"fixed","unit":"logistic rate per month (midpoint at mid-season)","range":"n/a","source":"Assumed logistic shape, scaled so end-of-season biomass equals N-10 x N-14. Satellite gives timing only (C-005).","original_region":"n/a","type":"Assumed","transferred":false,"how_solid":"ASSUMED shape. Season totals don't depend on it; only the month-by-month split does.","owner":"Khushi","verified":"13 Oct 2026: assumed shape, no source needed; season totals don't depend on it."},"N-22":{"parameter":"Grow-line length at Tower Bay","plain_english":"How many metres of kelp line were in the water.","value":360.0,"low":null,"high":null,"dist":"fixed","unit":"metres","range":"unknown","source":"ASSUMED equal to Tinderbox, the sister site in the same IMAS/CRC project: 360 m of grow-line on three 18 m rings and a 60 m array (Blue Economy CRC kelp mariculture page; harvest note 22 Nov 2024).","original_region":"Southeast Tasmania - Tinderbox","type":"Assumed","transferred":true,"how_solid":"ASSUMED. The single biggest unknown. Ask Jeff Wright (IMAS) for the Tower Bay line length and harvest weight; both would replace this and N-15.","owner":"Moniesh","verified":"13 Oct 2026: new. Replaces 'whole 7.9 ha permit area is kelp'."},"N-23":{"parameter":"Kelp lost from the farm as pieces","plain_english":"Share of what the farm grows that breaks off and drifts away before harvest.","value":0.13,"low":0.08,"high":0.49,"dist":"triangular","unit":"fraction of production","range":"0.08 - 0.49","source":"Fieler et al. (2021) Front. Mar. Sci. 8:632725, farmed Saccharina latissima, Norway: 8-13% of produced dry weight lost by a normal harvest; 49% when harvest was delayed to August.","original_region":"Norway - Saccharina latissima farms","type":"Transferred species","transferred":true,"how_solid":"OK. Measured on real kelp farms, but a different species and region. Tower Bay was harvested in November, later in the season than Biancacci et al. recommend, so losses may sit above the central value.","owner":"Khushi","verified":"13 Oct 2026: new; checked in the paper."},"N-24":{"parameter":"Carbon released dissolved (DOC)","plain_english":"Share of the carbon the kelp fixes that leaks out dissolved in the water.","value":0.23,"low":0.12,"high":0.29,"dist":"uniform","unit":"fraction of fixed carbon","range":"0.12 - 0.29","source":"Central: Krause-Jensen & Duarte (2016), DOC export 355 of 1,521 TgC/yr NPP (23%). Range: Neves et al. (2025), farmed Saccharina latissima, DOC release 12-29% of fixed carbon (via SINTEF summary).","original_region":"Global; Norway for the farm range","type":"Literature-derived","transferred":true,"how_solid":"OK. Consistent central and farm range, but no Macrocystis farm measurement.","owner":"Khushi","verified":"13 Oct 2026: new; K-J&D figures checked in the paper, Neves et al. via SINTEF summary."}},"paramIds":{"yield_kg_per_m":"N-15","dry_matter_fraction":"N-13","carbon_content_fraction":"N-01","poc_loss_fraction":"N-23","doc_release_fraction":"N-24","doc_deep_fraction":"N-18","poc_deep_fraction":"N-04","poc_burial_fraction":"N-05"},"late":{"low":0.344,"mode":0.494,"high":0.65}};
+const C = D.coef, PID = D.paramIds;
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmt = (x, d=1) => Number(x).toLocaleString("en-AU", {minimumFractionDigits:d, maximumFractionDigits:d});
+const co2 = t => t < 1 ? `${Math.round(t*1000).toLocaleString("en-AU")} kg` : `${fmt(t, t < 10 ? 2 : 1)} t`;
+
+/* model: same as modules/carbon.py v2 */
+function fate(p){
+  const poc = p.poc_loss_fraction, doc = p.doc_release_fraction;
+  const poc_deep = poc * p.poc_deep_fraction, buried = poc * (1 - p.poc_deep_fraction) * p.poc_burial_fraction, doc_deep = doc * p.doc_deep_fraction;
+  return {harvested: 1 - poc - doc, durable: poc_deep + buried + doc_deep};
+}
+function model(p, wet){
+  const ch = wet * p.dry_matter_fraction * p.carbon_content_fraction, f = fate(p), cf = ch / f.harvested;
+  return {wet, cf, durable_co2: cf * f.durable * D.co2PerC, f};
+}
+function rng(seed){ let a = seed >>> 0; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function draw(u, lo, m, hi, dist){
+  if (dist === "triangular"){ const F = (m-lo)/(hi-lo); return u < F ? lo + Math.sqrt(u*(hi-lo)*(m-lo)) : hi - Math.sqrt((1-u)*(hi-lo)*(hi-m)); }
+  return lo + u*(hi-lo);
+}
+const q = (a, p) => { const i = (a.length-1)*p, l = Math.floor(i), h = Math.ceil(i); return a[l] + (a[h]-a[l])*(i-l); };
+
+/* late harvest: Fieler et al. 2021, August harvest 49.4% lost (95% CI 34.4-70.8%), capped so losses stay below 100% */
+const LATE = D.late;
+function simulate(inp, n = 5000, seed = 41){
+  const R = rng(seed), out = new Float64Array(n);
+  for (let i = 0; i < n; i++){
+    const p = {};
+    for (const [k, id] of Object.entries(PID)){ const c = C[id]; p[k] = draw(R(), c.low, +c.value, c.high, c.dist); }
+    if (inp.timing === "late") p.poc_loss_fraction = draw(R(), LATE.low, LATE.mode, LATE.high, "triangular");
+    if (inp.timing === "unknown") p.poc_loss_fraction = R() < .5 ? p.poc_loss_fraction : draw(R(), LATE.low, LATE.mode, LATE.high, "triangular");
+    const wet = inp.harvest > 0 ? inp.harvest : inp.line * p.yield_kg_per_m / 1000;
+    out[i] = model(p, wet).durable_co2;
+  }
+  out.sort();
+  return {p5: q(out,.05), median: q(out,.5), p95: q(out,.95), max: out[n-1], samples: out};
+}
+
+const EVIDENCE = [
+  ["ev-harvest","Weighed harvest records, line by line","Replaces the biggest assumption: how much kelp grew.","Share weighed harvest records, line by line"],
+  ["ev-erosion","Erosion measured on the crop (e.g. tagged plants)","Replaces borrowed loss rates (N-23).","Measure how much kelp breaks off during the season"],
+  ["ev-doc","Dissolved carbon release measured","Replaces borrowed DOC rates (N-24).","Measure dissolved carbon released by the crop"],
+  ["ev-traps","Sediment traps or cores at and away from the farm","Shows where lost kelp actually settles.","Put sediment traps or cores at and away from the farm"],
+  ["ev-water","Water carbon chemistry around the farm","Needed to show CO₂ was drawn from the air.","Measure water carbon chemistry around the farm"],
+  ["ev-lca","Life-cycle emissions (boats, moorings, processing)","Must be subtracted from any credit.","Account for boat, mooring and processing emissions"],
+  ["ev-audit","Independent third-party audit","No approved seaweed methodology exists yet.","Commission an independent audit of the claim"],
+];
+$("#evidence").innerHTML = EVIDENCE.map(([id, l, h]) => `<label for="${id}"><input type="checkbox" id="${id}" ${id === "ev-harvest" ? "checked" : ""}><span>${l}<br><span class="muted" style="font-size:.78rem">${h}</span></span></label>`).join("");
+
+function read(){
+  const num = id => { const v = parseFloat($("#"+id).value); return isFinite(v) && v >= 0 ? v : 0; };
+  return {name: $("#name").value.trim() || "This farm", species: $("#species").value, line: num("line"), harvest: num("harvest"),
+    timing: $("#timing").value, fate: $("#fate").value, seabed: $("#seabed").value, claim: num("claim"),
+    ev: Object.fromEntries(EVIDENCE.map(([id]) => [id, $("#"+id).checked]))};
+}
+
+function assess(inp){
+  const r = simulate(inp);
+  const ratio = inp.claim / r.median;
+  let verdict;
+  if (inp.claim <= 0) verdict = {cls:"warn", tag:"No claim entered", head:"Enter the seller's claim to compare it.", body:""};
+  else if (inp.claim <= r.p95) verdict = {cls:"good", tag:"Within range", head:`The claim sits inside what SeaTrace finds plausible.`, body:`${co2(inp.claim)} is below the 95th percentile (${co2(r.p95)}). That makes it believable, not proven: the evidence list below still applies.`};
+  else if (inp.claim <= r.max) verdict = {cls:"warn", tag:"Above the likely range", head:`The claim is higher than 95% of SeaTrace's outcomes.`, body:`${co2(inp.claim)} is ${fmt(ratio,0)}× SeaTrace's median. Possible only if several inputs sit at their most favourable ends at once. Ask the seller which measurements support it.`};
+  else verdict = {cls:"bad", tag:"Not supported", head:`The claim exceeds every one of 5,000 SeaTrace runs.`, body:`${co2(inp.claim)} is ${fmt(ratio,0)}× SeaTrace's median and above its highest run (${co2(r.max)}). The seller is likely counting carbon that isn't stored, such as the harvested kelp or all carbon the crop absorbed.`};
+
+  const flags = [];
+  const absorbed = (inp.harvest > 0 ? inp.harvest : inp.line * C["N-15"].value / 1000) * C["N-13"].value * C["N-01"].value / fate(Object.fromEntries(Object.entries(PID).map(([k,id]) => [k, +C[id].value]))).harvested * D.co2PerC;
+  if (inp.claim > 0 && inp.claim >= absorbed * 0.5) flags.push(["high", "Claim close to everything the kelp absorbed", `The crop absorbed roughly ${co2(absorbed)} of CO₂ in total. A claim of ${co2(inp.claim)} implies most of it was stored, but most leaves in the harvest or rots.`, "Explain how the claim was calculated and which carbon it counts"]);
+  if (inp.species !== "mac") flags.push(["med", "Species not covered", "SeaTrace's coefficients are set for giant kelp. Treat this result as indicative only.", "Provide species-specific growth and carbon data"]);
+  if (!(inp.harvest > 0)) flags.push(["med", "No harvest weight", `Biomass was estimated from line length at 1.2–12 kg per metre. Weighed harvests would narrow the range a lot.`, "Provide weighed harvest records, line by line"]);
+  if (inp.timing === "late") flags.push(["low", "Late harvest", "More kelp breaks off before cutting, which raises stored carbon but also raises uncertainty about where it went.", "Give the exact harvest date"]);
+  if (inp.timing === "unknown") flags.push(["med", "Harvest timing unknown", "Losses differ about fourfold between a normal and a late harvest; SeaTrace allowed for both.", "Give the exact harvest date"]);
+  if (inp.fate === "sunk") flags.push(["high", "Deliberate sinking is not modelled", "Sunk harvests need a sinking-specific method with proof of depth and permanence. SeaTrace's range excludes the sunk kelp.", "Show the sinking depth, method and how permanence is proven"]);
+  if (inp.fate === "unknown") flags.push(["med", "Fate of the harvest unknown", "If the harvest is counted as stored, the claim is invalid unless it was sunk in deep water and verified.", "State in writing what happened to the harvest"]);
+  if (inp.seabed === "sand") flags.push(["low", "Sandy or rocky seabed", "Little settles to be buried. Published farm burial rates come from muddy, depositional sites."]);
+  if (inp.seabed === "unknown") flags.push(["low", "Seabed type unknown", "Burial depends on it; ask for a seabed survey."]);
+  EVIDENCE.forEach(([id, l, h, ask]) => { if (!inp.ev[id]) flags.push([id === "ev-water" || id === "ev-audit" || id === "ev-harvest" ? "high" : "med", `Missing: ${l.toLowerCase()}`, h, ask]); });
+  const order = {high:0, med:1, low:2}; flags.sort((a,b) => order[a[0]] - order[b[0]]);
+  return {r, verdict, flags, absorbed};
+}
+
+function render(){
+  const inp = read(), {r, verdict, flags, absorbed} = assess(inp);
+  const hi = Math.max(r.p95, inp.claim, r.max*0) * 1.12 || 1, X = v => Math.min(100, v / hi * 100);
+  const have = EVIDENCE.filter(([id]) => inp.ev[id]).length;
+  const asks = [...new Set(flags.filter(f => f[3]).map(f => f[3]))].slice(0, 6);
+  $("#out").innerHTML = `
+    <h3>3 · SeaTrace's assessment of ${esc(inp.name)}</h3>
+    <div class="verdict ${verdict.cls}"><span class="tag">${verdict.tag}</span><h3>${verdict.head}</h3>${verdict.body ? `<p style="font-size:.92rem">${verdict.body}</p>` : ""}</div>
+    <div class="card stack">
+      <div style="display:flex;gap:28px;flex-wrap:wrap">
+        <div><span class="eyebrow">SeaTrace estimate</span><div class="big num" style="font-size:2.6rem">${co2(r.median)}</div><span class="muted" style="font-size:.85rem">CO₂ stored, most likely</span></div>
+        <div><span class="eyebrow">Likely range</span><div class="num" style="font-size:1.4rem;margin-top:8px">${co2(r.p5)} – ${co2(r.p95)}</div><span class="muted" style="font-size:.85rem">90% of 5,000 runs</span></div>
+        <div><span class="eyebrow">Seller claims</span><div class="num" style="font-size:1.4rem;margin-top:8px;color:var(--accent)">${inp.claim > 0 ? co2(inp.claim) : "–"}</div><span class="muted" style="font-size:.85rem">${inp.claim > 0 ? fmt(inp.claim / r.median, 1) + "× the estimate" : ""}</span></div>
+      </div>
+      <div class="rangebar" aria-label="SeaTrace range compared with the claim">
+        <div class="track"></div>
+        <div class="span" style="left:${X(r.p5)}%;width:${X(r.p95)-X(r.p5)}%"></div>
+        <div class="tick" style="left:${X(r.median)}%"></div>
+        ${inp.claim > 0 ? `<div class="pt" style="left:${X(inp.claim)}%" title="Claim"></div>` : ""}
+        ${X(r.p95) - X(r.p5) < 22 ? `<div class="lab" style="left:${Math.max(12, (X(r.p5) + X(r.p95)) / 2)}%">${co2(r.p5)}–${co2(r.p95)}</div>` : `<div class="lab" style="left:${X(r.p5)}%">${co2(r.p5)}</div><div class="lab" style="left:${X(r.p95)}%">${co2(r.p95)}</div>`}
+        ${inp.claim > 0 && X(inp.claim) > X(r.p95) + 12 ? `<div class="lab" style="left:${X(inp.claim)}%;color:var(--accent)">claim</div>` : ""}
+      </div>
+      <p class="muted" style="font-size:.82rem">For scale: the crop absorbed roughly ${co2(absorbed)} of CO₂ in total. About two-thirds leaves in a normal harvest, and most of what breaks off rots.${inp.fate === "sunk" ? " The sunk harvest is not included." : ""} Figures are before any allowance for the sea re-absorbing CO₂ from the air.</p>
+    </div>
+    <div class="grid2">
+      <div class="card stack"><h3>Red flags</h3><div class="flags">${flags.length ? flags.map(([s, t, d]) => `<div class="flag"><span class="sev ${s}">${s === "med" ? "medium" : s}</span><div><b>${esc(t)}</b><br><span class="muted">${esc(d)}</span></div></div>`).join("") : '<p class="muted">None found.</p>'}</div></div>
+      <div class="card stack"><h3>Before you buy, ask the seller to</h3><ol class="steps">${asks.length ? asks.map(a => `<li><span>${esc(a)}.</span></li>`).join("") : "<li><span>Confirm the evidence they ticked can be shared with an auditor.</span></li>"}</ol>
+        <p class="muted" style="font-size:.82rem">Evidence provided: ${have} of ${EVIDENCE.length}. No seaweed carbon methodology is approved yet (Verra M0172 is in draft), so no credit can currently be certified.</p></div>
+    </div>
+    <div class="card stack">
+      <div style="display:flex;justify-content:space-between;align-items:end;gap:12px;flex-wrap:wrap"><h3>Summary to share</h3><button class="btn ghost" type="button" id="copy">Copy summary</button></div>
+      <pre class="report" id="sum" tabindex="0"></pre><span class="muted" id="copy-msg" style="font-size:.85rem"></span>
+    </div>`;
+  const sum = [
+    `SeaTrace credit check: ${inp.name}`,
+    `Prototype, model 2.0. Not a certification.`, ``,
+    `Seller's claim: ${inp.claim > 0 ? co2(inp.claim) + " CO2" : "not entered"}`,
+    `SeaTrace estimate: ${co2(r.median)} CO2 (90% range ${co2(r.p5)} to ${co2(r.p95)}; 5,000 runs)`,
+    `Verdict: ${verdict.tag}. ${verdict.head}`, ``,
+    `Inputs: ${inp.line.toLocaleString()} m of line; harvest ${inp.harvest > 0 ? inp.harvest + " t wet" : "estimated"}; timing ${inp.timing}; harvest ${inp.fate}; seabed ${inp.seabed}.`, ``,
+    `Red flags:`, ...flags.map(([s, t, d]) => `- [${s}] ${t}: ${d}`), ``,
+    `Method: harvested biomass x dry matter x carbon content, losses before harvest from farm studies (Fieler et al. 2021; Krause-Jensen & Duarte 2016), fate fractions from Krause-Jensen & Duarte 2016. Air-sea re-equilibration and life-cycle emissions not included.`
+  ].join("\n");
+  $("#sum").textContent = sum;
+  $("#copy").addEventListener("click", () => {
+    const msg = $("#copy-msg"), sel = () => { const rg = document.createRange(); rg.selectNodeContents($("#sum")); const s = getSelection(); s.removeAllRanges(); s.addRange(rg); msg.textContent = "Selected. Press Ctrl+C or ⌘C to copy."; };
+    try { navigator.clipboard.writeText(sum).then(() => msg.textContent = "Copied.", sel); } catch(e) { sel(); }
+  });
+}
+$("#f").addEventListener("submit", e => { e.preventDefault(); render(); $("#out").scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"}); });
+$("#f").addEventListener("input", () => { $("#ex-tag").hidden = true; });
+$("#clear").addEventListener("click", () => { ["name","line","harvest","claim"].forEach(id => $("#"+id).value = ""); EVIDENCE.forEach(([id]) => $("#"+id).checked = false); $("#ex-tag").hidden = true; $("#out").innerHTML = '<p class="muted">Fill in the farm and press Check this claim.</p>'; });
+$("#foot").innerHTML = `SeaTrace prototype · Team 41, QUT. Same model as the SeaTrace app (model 2.0, sources checked ${D.generated}). Estimates rest on published studies, not measurements of the farm checked; they are a screening tool, not a verification.`;
+render();
+</script>

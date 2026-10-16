@@ -1,57 +1,72 @@
 """
-Biomass — estimate how much seaweed grew from satellite imagery.
+Biomass - how much kelp the Tower Bay trial grew.
 
-Owner: Moniesh
-Epic 1 of 5. See config/coefficients.py for N-09 (farm location), N-10 (farm
-area), N-12 (usable Sentinel-2 scenes), and N-14 (literature yield fallback).
+Owner: Moniesh. Epic E2.
 
-Sprint 1: stub only. Not allowed until Sprint 4: ML biomass prediction.
+Revised 13 Oct 2026 after source verification. The 7.9 ha in N-10 is the
+permit area, not the area under kelp. The CRC trials were research-scale:
+three 18 m rings and a 60 m array, ~360 m of grow-line at the sister site
+Tinderbox. So biomass is grow-line length x yield per metre:
+
+    harvested wet biomass = N-22 (360 m, assumed = Tinderbox) x N-15 (10 kg/m)
+
+Satellite imagery (N-12) still gives timing only (C-005).
+The old area x wild yield figure (N-10 x N-14) is kept as the 'full-scale
+farm' scenario.
 """
 
-from config.coefficients import get_coefficient
+import math
+
+from config.coefficients import get_coefficient, get_value
 
 
-def get_biomass(farm_geometry=None, start_date=None, end_date=None):
-    """Estimate wet biomass (tonnes) for the farm over the given date window.
-
-    This is a Sprint 1 stub. It returns a fixed placeholder value so the rest
-    of the pipeline (carbon, fate, uncertainty, map) can be wired together and
-    smoke-tested end to end before the real Sentinel-2 pipeline exists.
-
-    Real implementation (later sprint) will:
-      1. Pull Sentinel-2 scenes over farm_geometry between start_date/end_date
-         (see N-12, usable scene count - currently blocked on B-03).
-      2. Apply a biomass index (e.g. NDVI/FAI-derived) to estimate wet
-         biomass per hectare.
-      3. Multiply by farm area (N-10 - currently blocked on B-02).
-      4. Fall back to the literature yield figure (N-14) if imagery is
-         insufficient.
-
-    Args:
-        farm_geometry: A GeoPandas/Shapely geometry for the farm boundary.
-            Sprint 1: unused, placeholder farm polygon lives in mapping.py.
-        start_date, end_date: Growing season window. Defaults to N-08
-            (April - August) when not supplied.
-
-    Returns:
-        dict with:
-            wet_biomass_tonnes (float): placeholder estimate
-            method (str): "stub" in Sprint 1
-            notes (str): what's still missing
-    """
-    season = get_coefficient("N-08")["value"]
-
-    # Placeholder value only - NOT derived from any real imagery yet.
-    # Do not use this number for anything beyond wiring/smoke-testing.
-    wet_biomass_tonnes = 12.5
-
+def get_biomass(yield_kg_per_m: float = None, line_m: float = None) -> dict:
+    line = line_m if line_m is not None else get_value("N-22")
+    y = yield_kg_per_m if yield_kg_per_m is not None else get_value("N-15")
+    c = get_coefficient("N-15")
     return {
-        "wet_biomass_tonnes": wet_biomass_tonnes,
-        "method": "stub",
-        "season": season,
+        "wet_biomass_tonnes": line * y / 1000,
+        "low_tonnes": line * c["low"] / 1000,
+        "high_tonnes": line * c["high"] / 1000,
+        "line_m": line,
+        "method": "grow-line length (N-22, assumed) x yield per metre (N-15)",
+        "season": get_value("N-08"),
+        "satellite_timing": get_coefficient("N-12")["scenes"],
         "notes": (
-            "Sprint 1 stub - fixed placeholder, not derived from satellite "
-            "imagery. Needs N-09 (farm location), N-10 (farm area), and B-03 "
-            "(Sentinel-2 scene count) resolved before this can be real."
+            "Tinderbox grew ~3.6 t on 360 m of line in ~6 months (Blue Economy CRC, Nov 2024). "
+            "Tower Bay is assumed to have the same layout. Low end uses 1.2 kg/m from "
+            "Biancacci et al. (2022). Ask IMAS for the Tower Bay line length and harvest weight."
         ),
     }
+
+
+def full_scale_biomass() -> dict:
+    """Scenario: the whole 7.9 ha permit area farmed at wild-forest density."""
+    area = get_value("N-10")
+    c = get_coefficient("N-14")
+    return {"wet_biomass_tonnes": area * c["value"], "low_tonnes": area * c["low"],
+            "high_tonnes": area * c["high"], "method": "N-10 x N-14 (scenario only)"}
+
+
+def season_series(final_wet_tonnes: float, months=None) -> list:
+    """Standing biomass and growth for each month of the season (N-08).
+
+    Logistic shape (N-21, assumed) scaled so the last month equals the
+    harvest biomass. Monthly increments sum exactly to the total.
+    """
+    months = months or get_coefficient("N-08")["months"]
+    r = get_value("N-21")
+    n = len(months)
+    mid = (n - 1) / 2
+
+    def raw(t):
+        return 1.0 / (1.0 + math.exp(-r * (t - mid)))
+
+    base = raw(-1)
+    scale = final_wet_tonnes / (raw(n - 1) - base)
+    rows, prev = [], 0.0
+    for i, m in enumerate(months):
+        standing = (raw(i) - base) * scale
+        rows.append({"month": m, "standing_wet_t": standing, "growth_wet_t": standing - prev})
+        prev = standing
+    return rows
