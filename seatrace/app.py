@@ -36,10 +36,11 @@ with st.sidebar:
 r = get_report(n, int(seed))
 h = r["headline"]
 
-c1, c2, c3 = st.columns(3)
+c1, c2, c3, c4 = st.columns(4)
 c1.metric("CO2 stored long term, median", f"{h['durable_co2_median_t']*1000:.0f} kg")
 c2.metric("90% range", f"{h['durable_co2_p5_t']*1000:.0f} - {h['durable_co2_p95_t']*1000:.0f} kg")
-c3.metric("Trial", f"{r['farm']['line_m']:.0f} m of line, {r['farm']['season']}")
+c3.metric("Creditable (5th percentile)", f"{h['durable_co2_p5_t']*1000:.0f} kg", help="The 5th percentile of the Monte Carlo runs: 95% of runs store at least this much. Following expert advice (Prof J. Rhodes, QUT, 22 Oct 2026), a credit claim should rest on this conservative figure, not the median.")
+c4.metric("Kelp line in trial", f"{r['farm']['line_m']:.0f} m", help=f"Trial season: {r['farm']['season']}")
 st.info("In plain terms: a research-sized trial stores a few tens of kilograms of CO2. Most of the carbon the kelp "
         "absorbed left in the harvest, and most of what broke off rotted and was released again. "
         "Not a certified carbon removal claim.")
