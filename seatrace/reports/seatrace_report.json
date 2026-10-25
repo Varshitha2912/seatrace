@@ -658,7 +658,7 @@
       "transferred": false,
       "how_solid": "GOOD - resolved (B-01).",
       "owner": "Ramesh",
-      "verified": "13 Oct 2026: IMAS email not re-checkable by Claude; CRC pages confirm Macrocystis trials at Tower Bay."
+      "verified": "13 Oct 2026: IMAS email not re-checked; CRC pages confirm Macrocystis trials at Tower Bay."
     },
     "N-12": {
       "parameter": "Usable Sentinel-2 scenes",
