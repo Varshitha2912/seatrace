@@ -35,7 +35,8 @@ def main():
     tpl = open(os.path.join(web, "template.html")).read()
     style = tpl[tpl.index('<link rel="preconnect"'):tpl.index("</style>")]
     body = open(os.path.join(web, "buyer_body.html")).read()
-    out = "<title>SeaTrace Credit Check</title>\n" + style + body.replace("/*__DATA__*/null", json.dumps(data, separators=(",", ":")))
+    head = tpl[:tpl.index("<title>")]  # doctype, charset and viewport from the template
+    out = head + "<title>SeaTrace Credit Check</title>\n" + style + body.replace("/*__DATA__*/null", json.dumps(data, separators=(",", ":")))
     path = os.path.join(web, "credit_check.html")
     with open(path, "w") as f:
         f.write(out)
